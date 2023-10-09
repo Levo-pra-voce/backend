@@ -8,6 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+    @Query("""
+        SELECT u.email, u.userType
+            FROM User u
+                WHERE u.email = :email
+    """)
     Optional<User> findByEmail(String email);
 
     @Query("""

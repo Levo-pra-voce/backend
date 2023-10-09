@@ -43,15 +43,16 @@ public class AuthenticateService {
                 .build();
         userRepository.save(user);
         String jwt = jwtService.generateToken(user);
-        return JwtResponseDTO.builder().token(jwt).build();
+        return JwtResponseDTO.builder().token(jwt).userType(dto.getUserType()).build();
     }
 
     public JwtResponseDTO signin(UserAuthenticationDTO dto) {
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
+            new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
+        );
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         String jwt = jwtService.generateToken(user);
-        return JwtResponseDTO.builder().token(jwt).build();
+        return JwtResponseDTO.builder().token(jwt).userType(user.getUserType()).build();
     }
 }
