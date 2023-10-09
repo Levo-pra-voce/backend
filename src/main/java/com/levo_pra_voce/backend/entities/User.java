@@ -45,6 +45,10 @@ public class User implements UserDetails {
     @Column(name = "contato")
     private String contact;
 
+    @OneToMany
+    @JoinColumn(name = "id_usuario")
+    private List<Address> addresses;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "perfil_usuario",
