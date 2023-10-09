@@ -1,13 +1,13 @@
 
 logging:
   level:
-    org.springframework: DEBUG
+    org.springframework: error
 spring:
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:

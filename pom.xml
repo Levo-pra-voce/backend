@@ -8,18 +8,18 @@
         <version>3.1.0</version>
         <relativePath/>
     </parent>
-    <groupId>com.school</groupId>
-    <artifactId>information-security</artifactId>
+    <groupId>com.levo-pra-voce</groupId>
+    <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>information-security</name>
-    <description>information-security</description>
+    <name>backend</name>
+    <description>backend</description>
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>17</maven.compiler.source>
 	<maven.compiler.target>17</maven.compiler.target>
-	<start-class>com.school.informationsecurity.InformationSecurityApplication</start-class>
+	<start-class>com.levo_pra_voce.backend.BackendApplication</start-class>
     </properties>
     <dependencies>
         <dependency>
@@ -104,7 +104,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.school.informationsecurity.InformationSecurityApplication</mainClass>
+                    <mainClass>com.levo_pra_voce.backend.BackendApplication</mainClass>
                     <layout>JAR</layout>	
                     <excludes>
                         <exclude>
