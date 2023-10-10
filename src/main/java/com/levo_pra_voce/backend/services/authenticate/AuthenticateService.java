@@ -32,19 +32,19 @@ public class AuthenticateService {
     private final JwtTokenUtil jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public JwtResponseDTO signup(UserAuthenticationDTO dto) {
-
-        User user = User.builder()
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .email(dto.getEmail()).password(passwordEncoder.encode(dto.getPassword()))
-                .status(Status.ACTIVE)
-                .userType(Objects.requireNonNull(dto.getUserType()))
-                .build();
-        userRepository.save(user);
-        String jwt = jwtService.generateToken(user);
-        return JwtResponseDTO.builder().token(jwt).userType(dto.getUserType()).build();
-    }
+//    public JwtResponseDTO signup(UserAuthenticationDTO dto) {
+//
+//        User user = User.builder()
+//                .firstName(dto.getFirstName())
+//                .lastName(dto.getLastName())
+//                .email(dto.getEmail()).password(passwordEncoder.encode(dto.getPassword()))
+//                .status(Status.ACTIVE)
+//                .userType(Objects.requireNonNull(dto.getUserType()))
+//                .build();
+//        userRepository.save(user);
+//        String jwt = jwtService.generateToken(user);
+//        return JwtResponseDTO.builder().token(jwt).userType(dto.getUserType()).build();
+//    }
 
     public JwtResponseDTO signin(UserAuthenticationDTO dto) {
         authenticationManager.authenticate(

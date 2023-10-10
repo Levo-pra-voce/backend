@@ -19,9 +19,4 @@ public class AuthenticateResource {
     public ResponseEntity<JwtResponseDTO> signin(@RequestBody UserAuthenticationDTO userAuthenticationDTO) {
       return ResponseEntity.ok(authenticateService.signin(userAuthenticationDTO));
     }
-
-    @PostMapping("/signup")
-    public ResponseEntity<JwtResponseDTO> signup(@RequestBody UserAuthenticationDTO userAuthenticationDTO) {
-      return ResponseEntity.ok(authenticateService.signup(userAuthenticationDTO));
-    }
 }
