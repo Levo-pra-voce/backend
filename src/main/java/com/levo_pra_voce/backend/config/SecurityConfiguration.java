@@ -1,6 +1,6 @@
 package com.levo_pra_voce.backend.config;
 
-import com.levo_pra_voce.backend.security.AuthEntryPointJwt;
+import com.levo_pra_voce.backend.security.AuthEntryPoint;
 import com.levo_pra_voce.backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,7 +30,7 @@ import java.util.List;
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
-    private final AuthEntryPointJwt unauthorizedHandler;
+    private final AuthEntryPoint unauthorizedHandler;
 
     @Bean
     SecurityFilterChain filterChain(
@@ -41,11 +41,15 @@ public class SecurityConfiguration {
         return httpSecurity
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                .exceptionHandling(exception ->
+                        exception
+                                .authenticationEntryPoint(unauthorizedHandler)
+                )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
