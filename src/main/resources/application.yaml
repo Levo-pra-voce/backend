@@ -1,7 +1,7 @@
 
 logging:
   level:
-    org.springframework: error
+    root: debug
 spring:
   jpa:
     database: postgresql
@@ -19,5 +19,8 @@ spring:
     password: postgres
     hikari:
       auto-commit: false
+  web:
+    resources:
+      add-mappings: false
 jwt:
   secret: secret
