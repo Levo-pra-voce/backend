@@ -1,3 +1,7 @@
+
+logging:
+  level:
+    root: debug
 spring:
   jpa:
     database: postgresql
@@ -15,5 +19,11 @@ spring:
     password: postgres
     hikari:
       auto-commit: false
+  web:
+    resources:
+      add-mappings: false
+  flyway:
+    schemas: public
+    baseline-on-migrate: true
 jwt:
   secret: secret

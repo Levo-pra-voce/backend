@@ -22,5 +22,8 @@ spring:
   web:
     resources:
       add-mappings: false
+  flyway:
+    schemas: public
+    baseline-on-migrate: true
 jwt:
   secret: secret
