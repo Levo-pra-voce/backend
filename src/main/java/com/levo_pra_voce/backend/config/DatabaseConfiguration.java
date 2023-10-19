@@ -4,6 +4,8 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -30,16 +32,32 @@ public class DatabaseConfiguration {
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
 
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String driverClassName;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
+
+    @Bean
+    public DataSource dataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(dbUrl);
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setDriverClassName(driverClassName);
+        return new HikariDataSource(config);
+    }
+
     @Bean
     @ConfigurationProperties("spring.datasource")
     DataSourceProperties dataSourceProperties() {
         return new DataSourceProperties();
-    }
-
-    @Bean
-    DataSource dataSource() {
-        DataSourceProperties dataSourceProperties = dataSourceProperties();
-        return dataSourceProperties.initializeDataSourceBuilder().build();
     }
 
     @Bean
