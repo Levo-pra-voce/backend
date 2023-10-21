@@ -24,13 +24,19 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)    
     private Long id;
+
     @Column(name = "senha")
     private String password;
+
+    @Column(name = "email")
     private String email;
+
     @Column(name = "primeiro_nome")
     private String firstName;
+
     @Column(name = "sobrenome")
     private String lastName;
+
     @Enumerated(EnumType.STRING)
     private Status status = Status.INACTIVE;
 
@@ -39,8 +45,10 @@ public class User implements UserDetails {
     private UserType userType;
 
     @Column(name = "ativo")
-    private boolean active = false;
+    private Boolean active = false;
+
     @Column(name = "data_criacao")
+
     private LocalDate creationDate;
     @Column(name = "contato")
     private String contact;
