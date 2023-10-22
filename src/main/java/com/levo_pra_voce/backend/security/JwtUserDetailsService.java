@@ -1,4 +1,4 @@
-package com.levo_pra_voce.backend.services.authenticate;
+package com.levo_pra_voce.backend.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
