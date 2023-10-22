@@ -37,6 +37,9 @@ public class User implements UserDetails {
     @Column(name = "sobrenome")
     private String lastName;
 
+    @Column(name = "cpf")
+    private String cpf;
+
     @Enumerated(EnumType.STRING)
     private Status status = Status.INACTIVE;
 
