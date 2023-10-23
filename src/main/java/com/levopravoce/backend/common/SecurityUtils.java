@@ -1,5 +1,6 @@
 package com.levopravoce.backend.common;
 
+import java.util.Optional;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.levopravoce.backend.entities.User;
@@ -12,10 +13,10 @@ public class SecurityUtils {
         throw new RuntimeException("User not found");
     }
 
-  public static User getCurrentUser() {
+  public static Optional<User> getCurrentUser() {
     if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
-      return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      return Optional.of((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
-    throw new RuntimeException("User not found");
+    return Optional.empty();
   }
 }
