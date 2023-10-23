@@ -64,7 +64,7 @@ public class DatabaseConfiguration {
         LocalContainerEntityManagerFactoryBean em 
             = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
-        em.setPackagesToScan("com.levo_pra_voce.backend.entities");
+    em.setPackagesToScan("com.levopravoce.backend.entities");
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);

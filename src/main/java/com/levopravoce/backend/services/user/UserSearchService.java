@@ -23,7 +23,6 @@ public class UserSearchService {
                     .email(user.getEmail())
                     .firstName(user.getFirstName())
                     .lastName(user.getLastName())
-                    .userType(user.getUserType())
                     .build())
         .orElseThrow(() -> new RuntimeException("User not found"));
   }
@@ -40,7 +39,6 @@ public class UserSearchService {
                     .email(user.getEmail())
                     .firstName(user.getFirstName())
                     .lastName(user.getLastName())
-                    .userType(user.getUserType())
                     .build())
         .toList();
   }
