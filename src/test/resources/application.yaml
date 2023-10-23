@@ -22,5 +22,7 @@ spring:
   web:
     resources:
       add-mappings: false
+  main:
+    allow-bean-definition-overriding: true
 jwt:
   secret: secret
