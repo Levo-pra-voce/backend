@@ -4,7 +4,7 @@ logging:
     org.springframework: debug
 spring:
   jpa:
-    database: postgresql
+    database: H2
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: none
@@ -14,7 +14,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
     username: sa
     password: password
     hikari:
@@ -24,5 +24,8 @@ spring:
       add-mappings: false
   main:
     allow-bean-definition-overriding: true
+  sql:
+    init:
+      platform: h2
 jwt:
   secret: secret
