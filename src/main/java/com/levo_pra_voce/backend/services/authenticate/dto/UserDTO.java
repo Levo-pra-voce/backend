@@ -1,11 +1,9 @@
 package com.levo_pra_voce.backend.services.authenticate.dto;
 
-import com.levo_pra_voce.backend.entities.UserType;
 import com.levo_pra_voce.backend.entities.Vehicle;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
 
 @Builder
 @Data
@@ -26,5 +24,4 @@ public class UserDTO {
   private String complement;
   private String neighborhood;
   private List<Vehicle> vehicles;
-  private UserType userType;
 }
