@@ -53,7 +53,7 @@ public class ClientUserService implements UserManagement {
 
   @Override
   public JwtResponseDTO update(UserDTO userDTO) {
-    
+
     User user =
         userRepository
             .findByEmail(userDTO.getEmail())
