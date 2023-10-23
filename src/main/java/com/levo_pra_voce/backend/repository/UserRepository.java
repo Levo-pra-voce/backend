@@ -8,19 +8,21 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query("""
+  @Query(
+      """
         SELECT u.email, u.userType
             FROM User u
                 WHERE u.email = :email and u.status = com.levo_pra_voce.backend.entities.Status.ACTIVE
     """)
-    Optional<User> findByEmail(String email);
+  Optional<User> findByEmail(String email);
 
-    @Query("""
+  @Query(
+      """
         SELECT u.firstName
             FROM User u
                 WHERE u.email = :email and u.status = com.levo_pra_voce.backend.entities.Status.ACTIVE
     """)
-    Optional<String> getNameByEmail(String email);
+  Optional<String> getNameByEmail(String email);
 
-    boolean existsByEmailOrCpf(String email, String cpf);
+  boolean existsByEmailOrCpf(String email, String cpf);
 }
