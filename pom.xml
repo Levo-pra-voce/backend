@@ -19,7 +19,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>17</maven.compiler.source>
 	<maven.compiler.target>17</maven.compiler.target>
-	<start-class>com.levo_pra_voce.backend.BackendApplication</start-class>
+	<start-class>com.levopravoce.backend.BackendApplication</start-class>
     </properties>
     <dependencies>
         <dependency>
@@ -126,7 +126,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.levo_pra_voce.backend.BackendApplication</mainClass>
+                    <mainClass>com.levopravoce.backend.BackendApplication</mainClass>
                     <layout>JAR</layout>	
                     <excludes>
                         <exclude>
