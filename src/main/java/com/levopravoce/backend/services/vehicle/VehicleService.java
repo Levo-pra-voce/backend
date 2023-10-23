@@ -1,10 +1,12 @@
 package com.levopravoce.backend.services.vehicle;
 
+import com.levopravoce.backend.common.AuthUtils;
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.repository.UserRepository;
 import com.levopravoce.backend.repository.VehicleRepository;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.Optional;
 public class VehicleService {
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
+  private final AuthUtils authUtils;
 
     private final String NOT_POSSIBLE_TO_UPDATE_VEHICLE_MESSAGE = "You can't update this vehicle";
 
@@ -39,10 +42,10 @@ public class VehicleService {
         vehicleToUpdate.setActive(vehicleForUpdate.isActive());
         vehicleToUpdate.setColor(vehicleForUpdate.getColor());
         vehicleToUpdate.setModel(vehicleForUpdate.getModel());
-        if (!vehicleForUpdate.getRatings().equals(vehicleToUpdate.getRatings())) {
+    if (!Objects.equals(vehicleForUpdate.getRatings(), vehicleToUpdate.getRatings())) {
             throw new IllegalArgumentException(NOT_POSSIBLE_TO_UPDATE_VEHICLE_MESSAGE);
         }
-        if (!vehicleForUpdate.getCreationDate().equals(vehicleToUpdate.getCreationDate())) {
+    if (!Objects.equals(vehicleForUpdate.getCreationDate(), vehicleToUpdate.getCreationDate())) {
             throw new IllegalArgumentException(NOT_POSSIBLE_TO_UPDATE_VEHICLE_MESSAGE);
         }
         vehicleToUpdate.setPlate(vehicleForUpdate.getPlate());
@@ -54,7 +57,7 @@ public class VehicleService {
                 .findById(vehicle.getId())
                 .orElseThrow();
 
-        if (!vehicle.getUser().getEmail().equals(SecurityUtils.getCurrentUsername())) {
+    if (!authUtils.emailIsSame(vehicleToDelete.getUser().getEmail())) {
             throw new IllegalArgumentException("You can't delete this vehicle");
         }
 
