@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthUtils {
   public boolean emailIsSame(String email) {
-    return Optional.ofNullable(email).filter(e -> e.equals(SecurityUtils.getCurrentUsername())).isPresent();
+    return Optional.ofNullable(email)
+        .filter(e -> e.equals(SecurityUtils.getCurrentUsername()))
+        .isPresent();
   }
 }
