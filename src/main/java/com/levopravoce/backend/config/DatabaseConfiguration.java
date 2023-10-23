@@ -25,72 +25,72 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 
-    @Value("${spring.jpa.properties.hibernate.dialect}")
-    private String dialect;
+  @Value("${spring.jpa.properties.hibernate.dialect}")
+  private String dialect;
 
-    @Value("${spring.jpa.hibernate.ddl-auto}")
-    private String ddlAuto;
+  @Value("${spring.jpa.hibernate.ddl-auto}")
+  private String ddlAuto;
 
-    @Value("${spring.datasource.url}")
-    private String dbUrl;
+  @Value("${spring.datasource.url}")
+  private String dbUrl;
 
-    @Value("${spring.datasource.driver-class-name}")
-    private String driverClassName;
+  @Value("${spring.datasource.driver-class-name}")
+  private String driverClassName;
 
-    @Value("${spring.datasource.username}")
-    private String username;
+  @Value("${spring.datasource.username}")
+  private String username;
 
-    @Value("${spring.datasource.password}")
-    private String password;
+  @Value("${spring.datasource.password}")
+  private String password;
 
-    @Bean
-    public DataSource dataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(dbUrl);
-        config.setUsername(username);
-        config.setPassword(password);
-        config.setDriverClassName(driverClassName);
-        return new HikariDataSource(config);
-    }
+  @Bean
+  public DataSource dataSource() {
+    HikariConfig config = new HikariConfig();
+    config.setJdbcUrl(dbUrl);
+    config.setUsername(username);
+    config.setPassword(password);
+    config.setDriverClassName(driverClassName);
+    return new HikariDataSource(config);
+  }
 
-    @Bean
-    @ConfigurationProperties("spring.datasource")
-    DataSourceProperties dataSourceProperties() {
-        return new DataSourceProperties();
-    }
+  @Bean
+  @ConfigurationProperties("spring.datasource")
+  DataSourceProperties dataSourceProperties() {
+    return new DataSourceProperties();
+  }
 
-    @Bean
-    LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-        LocalContainerEntityManagerFactoryBean em 
-            = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSource);
+  @Bean
+  LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
+    LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+    em.setDataSource(dataSource);
     em.setPackagesToScan("com.levopravoce.backend.entities");
 
-        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        em.setJpaVendorAdapter(vendorAdapter);
-        em.setJpaProperties(additionalProperties());
+    JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+    em.setJpaVendorAdapter(vendorAdapter);
+    em.setJpaProperties(additionalProperties());
 
-        return em;
-    }
+    return em;
+  }
 
-    @Bean
-    PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
+  @Bean
+  PlatformTransactionManager transactionManager(
+      LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+    JpaTransactionManager transactionManager = new JpaTransactionManager();
+    transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
 
-        return transactionManager;
-    }
+    return transactionManager;
+  }
 
-    @Bean
-    public PersistenceExceptionTranslationPostProcessor exceptionTranslation(){
-        return new PersistenceExceptionTranslationPostProcessor();
-    }
+  @Bean
+  public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
+    return new PersistenceExceptionTranslationPostProcessor();
+  }
 
-    Properties additionalProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);
-        properties.setProperty("hibernate.dialect", dialect);
-        
-        return properties;
-    }
+  Properties additionalProperties() {
+    Properties properties = new Properties();
+    properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);
+    properties.setProperty("hibernate.dialect", dialect);
+
+    return properties;
+  }
 }
