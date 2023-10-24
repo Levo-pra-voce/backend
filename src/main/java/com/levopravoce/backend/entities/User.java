@@ -1,5 +1,6 @@
 package com.levopravoce.backend.entities;
 
+import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,8 +38,8 @@ public class User implements UserDetails {
     @Column(name = "sobrenome")
     private String lastName;
 
-  @Column(name = "cpf")
-  private String cpf;
+    @Column(name = "cpf")
+    private String cpf;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.INACTIVE;
@@ -121,5 +122,15 @@ public class User implements UserDetails {
 
     private boolean isUserActive() {
         return Optional.ofNullable(this.status).map(status -> status.equals(Status.ACTIVE)).orElse(false);
+    }
+
+    public UserDTO toDTO() {
+        return UserDTO.builder()
+                .email(this.email)
+                .firstName(this.firstName)
+                .lastName(this.lastName)
+                .cpf(this.cpf)
+                .contact(this.contact)
+                .build();
     }
 }
