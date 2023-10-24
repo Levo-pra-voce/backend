@@ -30,7 +30,9 @@ public final class UserMock {
           .email(DELIVERY_EMAIL)
           .password("123456")
           .firstName("Test")
+          .lastName("Test")
           .cpf("12345678912")
+          .contact("123456789")
           .addresses(List.of(ADDRESS))
           .build();
   public static final User CLIENT_USER =
@@ -42,6 +44,7 @@ public final class UserMock {
           .firstName("Test")
           .lastName("Test")
           .cpf("12345678910")
+          .contact("123456789")
           .addresses(List.of(ADDRESS))
           .build();
 }
