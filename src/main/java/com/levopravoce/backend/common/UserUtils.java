@@ -43,6 +43,10 @@ public class UserUtils {
       throw new IllegalArgumentException("Password is required");
     }
 
+    if (userDTO.getPassword().length() < 6) {
+      throw new IllegalArgumentException("Password must have at least 6 characters");
+    }
+
     if (userDTO.getPhone() == null || userDTO.getPhone().isEmpty()) {
       throw new IllegalArgumentException("Phone is required");
     }
@@ -59,8 +63,8 @@ public class UserUtils {
       throw new IllegalArgumentException("CPF must have 11 digits");
     }
 
-    if (userDTO.getAddress() == null || userDTO.getAddress().isEmpty()) {
-      throw new IllegalArgumentException("Address is required");
+    if (!userDTO.getCpf().matches("[0-9]+")) {
+      throw new IllegalArgumentException("CPF must have only numbers");
     }
   }
 }
