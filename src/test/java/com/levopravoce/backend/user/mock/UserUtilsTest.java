@@ -1,6 +1,7 @@
 package com.levopravoce.backend.user.mock;
 
 import com.levopravoce.backend.common.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,21 +16,21 @@ public class UserUtilsTest {
     @Test
     @DisplayName("verifica se o primeiro nome está vazio ou nulo")
     public void givenUserDTOWithEmptyFirstName_whenValidateUserFields_thenThrowIllegalArgumentException() {
-        UserMock.CLIENT_USER.setFirstName("");
+        UserMock.CLIENT_USER.setFirstName(StringUtils.EMPTY);
         assertThrows(IllegalArgumentException.class, () -> userUtils.validateUserFields(UserMock.CLIENT_USER.toDTO()));
     }
 
     @Test
     @DisplayName("verifica se o sobrenome está vazio ou nulo")
     public void givenUserDTOWithEmptyLastName_whenValidateUserFields_thenThrowIllegalArgumentException() {
-        UserMock.CLIENT_USER.setLastName("");
+        UserMock.CLIENT_USER.setLastName(StringUtils.EMPTY);
         assertThrows(IllegalArgumentException.class, () -> userUtils.validateUserFields(UserMock.CLIENT_USER.toDTO()));
     }
 
     @Test
     @DisplayName("verifica se o email está vazio ou nulo")
     public void givenUserDTOWithEmptyEmail_whenValidateUserFields_thenThrowIllegalArgumentException() {
-        UserMock.CLIENT_USER.setEmail("");
+        UserMock.CLIENT_USER.setEmail(StringUtils.EMPTY);
         assertThrows(IllegalArgumentException.class, () -> userUtils.validateUserFields(UserMock.CLIENT_USER.toDTO()));
     }
 
@@ -43,7 +44,7 @@ public class UserUtilsTest {
     @Test
     @DisplayName("verifica se a senha está vazia ou nula")
     public void givenUserDTOWithEmptyPassword_whenValidateUserFields_thenThrowIllegalArgumentException() {
-        UserMock.CLIENT_USER.setPassword("");
+        UserMock.CLIENT_USER.setPassword(StringUtils.EMPTY);
         assertThrows(IllegalArgumentException.class, () -> userUtils.validateUserFields(UserMock.CLIENT_USER.toDTO()));
     }
 
@@ -57,7 +58,7 @@ public class UserUtilsTest {
     @Test
     @DisplayName("verifica se o telefone está vazio ou nulo")
     public void givenUserDTOWithEmptyPhone_whenValidateUserFields_thenThrowIllegalArgumentException() {
-        UserMock.CLIENT_USER.setContact("");
+        UserMock.CLIENT_USER.setContact(StringUtils.EMPTY);
         assertThrows(IllegalArgumentException.class, () -> userUtils.validateUserFields(UserMock.CLIENT_USER.toDTO()));
     }
 
@@ -71,7 +72,7 @@ public class UserUtilsTest {
     @Test
     @DisplayName("verifica se o cpf está vazio ou nulo")
     public void givenUserDTOWithEmptyCpf_whenValidateUserFields_thenThrowIllegalArgumentException() {
-        UserMock.CLIENT_USER.setCpf("");
+        UserMock.CLIENT_USER.setCpf(StringUtils.EMPTY);
         assertThrows(IllegalArgumentException.class, () -> userUtils.validateUserFields(UserMock.CLIENT_USER.toDTO()));
     }
 
