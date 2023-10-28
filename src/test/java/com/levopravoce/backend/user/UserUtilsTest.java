@@ -1,6 +1,7 @@
-package com.levopravoce.backend.user.mock;
+package com.levopravoce.backend.user;
 
 import com.levopravoce.backend.common.UserUtils;
+import com.levopravoce.backend.user.mock.UserMock;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
