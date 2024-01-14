@@ -8,11 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, Long> {
   @Query(
-      """
-        SELECT u.email, u.userType
-            FROM User u
-                WHERE u.email = :email and u.status = com.levopravoce.backend.entities.Status.ACTIVE
-    """)
+      value = """
+              select * from usuario u where u.email = :email and u.status = 'ACTIVE'
+          """, nativeQuery = true)
   Optional<User> findByEmail(String email);
 
   @Query(
