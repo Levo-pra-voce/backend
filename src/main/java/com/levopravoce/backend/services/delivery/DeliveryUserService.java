@@ -11,6 +11,7 @@ import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,13 @@ public class DeliveryUserService implements UserManagement {
   public JwtResponseDTO save(UserDTO userDTO) {
 
     userUtils.validateUserFields(userDTO);
+
+    var optionalVehicle =
+        Optional.ofNullable(userDTO.getVehicles()).orElse(List.of());
+
+    if (optionalVehicle.size() != 1) {
+      throw new IllegalArgumentException("Only one vehicle is allowed");
+    }
 
     if (userRepository.existsByEmailOrCpf(userDTO.getEmail(), userDTO.getCpf())) {
       throw new IllegalArgumentException("Email already exists");
