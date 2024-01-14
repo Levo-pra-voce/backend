@@ -27,3 +27,6 @@ spring:
     baseline-on-migrate: true
 jwt:
   secret: secret
+
+server:
+  port: 8888
