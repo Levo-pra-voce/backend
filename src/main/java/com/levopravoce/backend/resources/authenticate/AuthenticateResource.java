@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticateResource {
     private final AuthenticateService authenticateService;
 
-  @GetMapping("/login")
+  @PostMapping("/login")
   public ResponseEntity<JwtResponseDTO> signin(@RequestBody UserDTO userAuthenticationDTO) {
       return ResponseEntity.ok(authenticateService.signin(userAuthenticationDTO));
     }
