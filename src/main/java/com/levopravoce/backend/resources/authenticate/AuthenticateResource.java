@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticateResource {
     private final AuthenticateService authenticateService;
 
-  @GetMapping("/signin")
+  @GetMapping("/login")
   public ResponseEntity<JwtResponseDTO> signin(@RequestBody UserDTO userAuthenticationDTO) {
       return ResponseEntity.ok(authenticateService.signin(userAuthenticationDTO));
     }
 
-  @PostMapping("/signup/{userType}")
+  @PostMapping("/register/{userType}")
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<JwtResponseDTO> signup(
       @PathVariable UserType userType, @RequestBody UserDTO userAuthenticationDTO) {
