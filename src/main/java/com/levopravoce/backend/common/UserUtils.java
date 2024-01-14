@@ -2,15 +2,31 @@ package com.levopravoce.backend.common;
 
 import com.levopravoce.backend.entities.Address;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserUtils {
+
   private final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
 
   public Address buildAddressByUserDTO(UserDTO userDTO) {
+
+    if (
+        userDTO.getComplement() == null ||
+            userDTO.getComplement().isEmpty() ||
+            userDTO.getCity() == null ||
+            userDTO.getCity().isEmpty() ||
+            userDTO.getState() == null ||
+            userDTO.getState().isEmpty() ||
+            userDTO.getZipCode() == null ||
+            userDTO.getZipCode().isEmpty() ||
+            userDTO.getNeighborhood() == null ||
+            userDTO.getNeighborhood().isEmpty()
+    ) {
+      throw new IllegalArgumentException("Address fields are required");
+    }
+
     return Address.builder()
         .complement(userDTO.getComplement())
         .city(userDTO.getCity())
