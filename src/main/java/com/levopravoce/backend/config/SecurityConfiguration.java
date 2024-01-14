@@ -2,6 +2,7 @@ package com.levopravoce.backend.config;
 
 import com.levopravoce.backend.security.AuthEntryPoint;
 import com.levopravoce.backend.security.JwtAuthenticationFilter;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -22,73 +23,72 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserDetailsService userDetailsService;
-    private final AuthEntryPoint unauthorizedHandler;
 
-    private final String[] AUTH_WHITELIST = {
-        "/api/auth/**",
-        "/error"
-    };
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final UserDetailsService userDetailsService;
+  private final AuthEntryPoint unauthorizedHandler;
 
-    @Bean
-    SecurityFilterChain filterChain(
-        HttpSecurity httpSecurity, 
-        AuthenticationProvider authenticationProvider, 
-        @Qualifier("customCorsConfiguration") CorsConfiguration corsConfiguration
-    ) throws Exception {
-        return httpSecurity
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception ->
-                        exception
-                                .authenticationEntryPoint(unauthorizedHandler)
-                )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+  private final String[] AUTH_WHITELIST = {
+      "/api/auth/**",
+      "/error"
+  };
 
-    @Bean(name = "customCorsConfiguration")
-    CorsConfiguration customCorsConfiguration() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
+  @Bean
+  SecurityFilterChain filterChain(
+      HttpSecurity httpSecurity,
+      AuthenticationProvider authenticationProvider,
+      @Qualifier("customCorsConfiguration") CorsConfiguration corsConfiguration
+  ) throws Exception {
+    return httpSecurity
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(AUTH_WHITELIST).permitAll()
+            .anyRequest().authenticated()
+        )
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(AbstractHttpConfigurer::disable)
+        .exceptionHandling(exception ->
+            exception
+                .authenticationEntryPoint(unauthorizedHandler)
+        )
+        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authenticationProvider(authenticationProvider)
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+  }
 
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        config.setExposedHeaders(List.of("Authorization"));
-        source.registerCorsConfiguration("/**", config);
+  @Bean(name = "customCorsConfiguration")
+  CorsConfiguration customCorsConfiguration() {
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration config = new CorsConfiguration();
 
-        return config;
-    }
+    config.addAllowedOrigin("*");
+    config.addAllowedHeader("*");
+    config.addAllowedMethod("*");
+    config.setExposedHeaders(List.of("Authorization"));
+    source.registerCorsConfiguration("/**", config);
 
-    @Bean
-    AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-        return authProvider;
-    }
+    return config;
+  }
 
-    @Bean
-    BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    authProvider.setUserDetailsService(userDetailsService);
+    authProvider.setPasswordEncoder(passwordEncoder);
+    return authProvider;
+  }
 
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+  @Bean
+  PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+  }
 }
