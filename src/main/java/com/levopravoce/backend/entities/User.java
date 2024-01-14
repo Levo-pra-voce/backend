@@ -120,6 +120,11 @@ public class User implements UserDetails {
         return this.email;
     }
 
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
     private boolean isUserActive() {
         return Optional.ofNullable(this.status).map(status -> status.equals(Status.ACTIVE)).orElse(false);
     }
