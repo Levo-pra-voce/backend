@@ -1,5 +1,6 @@
 package com.levopravoce.backend.services.authenticate.dto;
 
+import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.entities.Vehicle;
 import java.util.List;
 import lombok.Builder;
@@ -22,5 +23,6 @@ public class UserDTO {
   private String status;
   private String complement;
   private String neighborhood;
+  private UserType userType;
   private List<Vehicle> vehicles;
 }

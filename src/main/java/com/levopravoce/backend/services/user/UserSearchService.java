@@ -23,6 +23,9 @@ public class UserSearchService {
                     .email(user.getEmail())
                     .firstName(user.getFirstName())
                     .lastName(user.getLastName())
+                    .vehicles(user.getVehicles())
+                    .status(user.getStatus().name())
+                    .userType(user.getUserType())
                     .build())
         .orElseThrow(() -> new RuntimeException("User not found"));
   }
