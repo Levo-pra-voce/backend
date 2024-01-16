@@ -61,7 +61,7 @@ public class User implements UserDetails {
     @JoinColumn(name = "id_usuario")
     private List<Address> addresses;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "perfil_usuario",
             joinColumns = @JoinColumn(name = "id_usuario"),
