@@ -25,4 +25,5 @@ public class UserDTO {
   private String neighborhood;
   private UserType userType;
   private List<Vehicle> vehicles;
+  private String token;
 }

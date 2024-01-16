@@ -1,7 +1,9 @@
 package com.levopravoce.backend.services.user;
 
 import com.levopravoce.backend.common.SecurityUtils;
+import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.repository.UserRepository;
+import com.levopravoce.backend.security.JwtTokenUtil;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,21 +15,25 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserSearchService {
   private final UserRepository userRepository;
+  private final JwtTokenUtil jwtService;
 
   public UserDTO getUser(String email) {
-    return userRepository
+
+    User user = userRepository
         .findByEmail(email)
-        .map(
-            user ->
-                UserDTO.builder()
-                    .email(user.getEmail())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .vehicles(user.getVehicles())
-                    .status(user.getStatus().name())
-                    .userType(user.getUserType())
-                    .build())
         .orElseThrow(() -> new RuntimeException("User not found"));
+
+    String jwt = jwtService.generateToken(user);
+
+    return UserDTO.builder()
+        .email(user.getEmail())
+        .firstName(user.getFirstName())
+        .lastName(user.getLastName())
+        .vehicles(user.getVehicles())
+        .status(user.getStatus().name())
+        .userType(user.getUserType())
+        .token(jwt)
+        .build();
   }
 
   public List<UserDTO> getUserList() {
