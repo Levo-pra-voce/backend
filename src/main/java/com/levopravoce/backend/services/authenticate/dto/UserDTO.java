@@ -23,6 +23,7 @@ public class UserDTO {
   private String status;
   private String complement;
   private String neighborhood;
+  private String street;
   private UserType userType;
   private List<Vehicle> vehicles;
   private String token;
