@@ -31,11 +31,8 @@ public class DeliveryUserService implements UserManagement {
 
     userUtils.validateUserFields(userDTO);
 
-    var optionalVehicle =
-        Optional.ofNullable(userDTO.getVehicles()).orElse(List.of());
-
-    if (optionalVehicle.size() != 1) {
-      throw new IllegalArgumentException("Only one vehicle is allowed");
+    if (userDTO.getVehicle() == null) {
+      throw new IllegalArgumentException("Vehicle is required");
     }
 
     if (userRepository.existsByEmailOrCpf(userDTO.getEmail(), userDTO.getCpf())) {
@@ -52,7 +49,7 @@ public class DeliveryUserService implements UserManagement {
             .status(Status.ACTIVE)
             .userType(UserType.ENTREGADOR)
             .addresses(List.of(userUtils.buildAddressByUserDTO(userDTO)))
-            .vehicles(Objects.requireNonNull(userDTO.getVehicles()))
+            .vehicles(List.of(Objects.requireNonNull(userDTO.getVehicle())))
             .build();
 
     userRepository.save(user);

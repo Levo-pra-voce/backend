@@ -25,7 +25,7 @@ public class UserDTO {
   private String neighborhood;
   private String street;
   private UserType userType;
-  private List<Vehicle> vehicles;
+  private Vehicle vehicle;
   private String token;
   private String addressNumber;
 }
