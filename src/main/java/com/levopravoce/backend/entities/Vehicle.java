@@ -1,5 +1,6 @@
 package com.levopravoce.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class Vehicle {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario")
+    @JsonIgnore
     private User user;
 
     @Column(name = "placa")
