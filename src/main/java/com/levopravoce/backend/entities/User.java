@@ -57,7 +57,7 @@ public class User implements UserDetails {
     @Column(name = "contato")
     private String contact;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_usuario")
     private List<Address> addresses;
 
