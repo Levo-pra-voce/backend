@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class UserUtilsTest {
 
-  private final UserUtils userUtils = new UserUtils();
+  private final UserUtils userUtils = new UserUtils(null);
 
     @Test
     @DisplayName("verifica se o primeiro nome está vazio ou nulo")
