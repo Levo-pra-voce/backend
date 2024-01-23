@@ -33,6 +33,7 @@ public class UserUtils {
         .complement(viaCepResponse.getComplemento())
         .city(viaCepResponse.getLocalidade())
         .state(viaCepResponse.getUf())
+        .street(viaCepResponse.getLogradouro())
         .number(userDTO.getAddressNumber())
         .zipCode(viaCepResponse.getCep().replace("-", ""))
         .creationDate(LocalDateTime.now())
