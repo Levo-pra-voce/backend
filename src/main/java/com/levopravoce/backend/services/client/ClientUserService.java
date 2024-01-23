@@ -1,6 +1,7 @@
 package com.levopravoce.backend.services.client;
 
 import com.levopravoce.backend.common.UserUtils;
+import com.levopravoce.backend.entities.Address;
 import com.levopravoce.backend.entities.Status;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
@@ -33,6 +34,8 @@ public class ClientUserService implements UserManagement {
       throw new IllegalArgumentException("Email already exists");
     }
 
+    Address address = userUtils.buildAddressByUserDTO(userDTO);
+
     User user =
         User.builder()
             .firstName(userDTO.getFirstName())
@@ -42,10 +45,10 @@ public class ClientUserService implements UserManagement {
             .contact(userDTO.getContact())
             .status(Status.ACTIVE)
             .userType(UserType.CLIENTE)
-            .addresses(List.of(userUtils.buildAddressByUserDTO(userDTO)))
+            .addresses(List.of(address))
             .build();
 
-    userRepository.save(user);
+    user = userRepository.save(user);
 
     String jwt = jwtService.generateToken(user);
     return JwtResponseDTO.builder().token(jwt).userType(UserType.CLIENTE).build();
