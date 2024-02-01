@@ -3,7 +3,7 @@ package com.levopravoce.backend.entities;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
+@Getter//
 @RequiredArgsConstructor
 public enum UserType {
     ENTREGADOR("ENTREGADOR"),

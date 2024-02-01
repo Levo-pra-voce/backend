@@ -38,8 +38,7 @@ public class ClientUserService implements UserManagement {
 
     User user =
         User.builder()
-            .firstName(userDTO.getFirstName())
-            .lastName(userDTO.getLastName())
+            .name(userDTO.getName())
             .email(userDTO.getEmail())
             .password(passwordEncoder.encode(userDTO.getPassword()))
             .contact(userDTO.getContact())
@@ -62,8 +61,7 @@ public class ClientUserService implements UserManagement {
             .findByEmail(userDTO.getEmail())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-    user.setFirstName(userDTO.getFirstName());
-    user.setLastName(userDTO.getLastName());
+    user.setName(userDTO.getName());
     user.setContact(userDTO.getContact());
 
     userRepository.save(user);

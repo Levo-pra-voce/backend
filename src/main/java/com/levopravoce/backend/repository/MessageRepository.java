@@ -11,7 +11,7 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     @Query("""
-        SELECT m.message, m.sender.email, m.sender.firstName
+                SELECT m.message, m.sender.email, m.sender.name
             FROM Message m
                 WHERE m.group.id = :groupId
         ORDER BY m.date

@@ -28,8 +28,7 @@ public class UserSearchService {
 
     return UserDTO.builder()
         .email(user.getEmail())
-        .firstName(user.getFirstName())
-        .lastName(user.getLastName())
+        .name(user.getName())
         .vehicle(Optional.ofNullable(user.getVehicles())
             .orElse(List.of())
             .stream().findFirst()
@@ -54,8 +53,7 @@ public class UserSearchService {
             user ->
                 UserDTO.builder()
                     .email(user.getEmail())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
+                    .name(user.getName())
                     .build())
         .toList();
   }

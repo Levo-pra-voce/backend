@@ -41,7 +41,7 @@ public class ChatService {
         MessageResponseDTO messageResponseDTO = new MessageResponseDTO();
         messageResponseDTO.setMessage(new String(message.getMessage()));
         messageResponseDTO.setSender(message.getSender().getEmail());
-        messageResponseDTO.setName(message.getSender().getFirstName());
+        messageResponseDTO.setName(message.getSender().getName());
         return messageResponseDTO;
     }
 }

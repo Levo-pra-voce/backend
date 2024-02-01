@@ -32,11 +32,8 @@ public class User implements UserDetails {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "primeiro_nome")
-    private String firstName;
-
-    @Column(name = "sobrenome")
-    private String lastName;
+    @Column(name = "nome")
+    private String name;
 
     @Column(name = "cpf")
     private String cpf;
@@ -132,8 +129,7 @@ public class User implements UserDetails {
     public UserDTO toDTO() {
         return UserDTO.builder()
                 .email(this.email)
-                .firstName(this.firstName)
-                .lastName(this.lastName)
+            .name(this.name)
                 .cpf(this.cpf)
                 .contact(this.contact)
                 .build();

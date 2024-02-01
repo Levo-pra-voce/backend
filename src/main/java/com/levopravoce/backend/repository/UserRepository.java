@@ -15,7 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @Query(
       """
-        SELECT u.firstName
+              SELECT u.name
             FROM User u
                 WHERE u.email = :email and u.status = com.levopravoce.backend.entities.Status.ACTIVE
     """)

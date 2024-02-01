@@ -2,15 +2,14 @@ package com.levopravoce.backend.services.authenticate.dto;
 
 import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.entities.Vehicle;
-import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
 @Builder
 @Data
 public class UserDTO {
-  private String firstName;
-  private String lastName;
+
+  private String name;
   private String email;
   private String password;
   private String phone;

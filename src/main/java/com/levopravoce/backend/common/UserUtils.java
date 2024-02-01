@@ -43,12 +43,8 @@ public class UserUtils {
   }
 
   public void validateUserFields(UserDTO userDTO) {
-    if (userDTO.getFirstName() == null || userDTO.getFirstName().isEmpty()) {
-      throw new IllegalArgumentException("First name is required");
-    }
-
-    if (userDTO.getLastName() == null || userDTO.getLastName().isEmpty()) {
-      throw new IllegalArgumentException("Last name is required");
+    if (userDTO.getName() == null || userDTO.getName().isEmpty()) {
+      throw new IllegalArgumentException("Name is required");
     }
 
     if (userDTO.getEmail() == null || userDTO.getEmail().isEmpty()) {

@@ -15,16 +15,9 @@ public class UserUtilsTest {
   private final UserUtils userUtils = new UserUtils(null);
 
     @Test
-    @DisplayName("verifica se o primeiro nome está vazio ou nulo")
+    @DisplayName("verifica se o nome está vazio ou nulo")
     public void givenUserDTOWithEmptyFirstName_whenValidateUserFields_thenThrowIllegalArgumentException() {
-        UserMock.CLIENT_USER.setFirstName(StringUtils.EMPTY);
-        assertThrows(IllegalArgumentException.class, () -> userUtils.validateUserFields(UserMock.CLIENT_USER.toDTO()));
-    }
-
-    @Test
-    @DisplayName("verifica se o sobrenome está vazio ou nulo")
-    public void givenUserDTOWithEmptyLastName_whenValidateUserFields_thenThrowIllegalArgumentException() {
-        UserMock.CLIENT_USER.setLastName(StringUtils.EMPTY);
+      UserMock.CLIENT_USER.setName(StringUtils.EMPTY);
         assertThrows(IllegalArgumentException.class, () -> userUtils.validateUserFields(UserMock.CLIENT_USER.toDTO()));
     }
 
