@@ -14,6 +14,7 @@ public class UserDTO {
   private String password;
   private String phone;
   private String cpf;
+  private String cnh;
   private String city;
   private String contact;
   private String state;

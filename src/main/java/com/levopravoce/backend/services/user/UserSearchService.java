@@ -29,6 +29,8 @@ public class UserSearchService {
     return UserDTO.builder()
         .email(user.getEmail())
         .name(user.getName())
+        .cpf(user.getCpf())
+        .cnh(user.getCnh())
         .vehicle(Optional.ofNullable(user.getVehicles())
             .orElse(List.of())
             .stream().findFirst()
