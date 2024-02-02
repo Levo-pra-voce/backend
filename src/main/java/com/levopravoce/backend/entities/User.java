@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Table(name = "usuario")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "senha")
@@ -37,6 +37,9 @@ public class User implements UserDetails {
 
     @Column(name = "cpf")
     private String cpf;
+
+    @Column(name = "cnh")
+    private String cnh;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.INACTIVE;
@@ -107,7 +110,7 @@ public class User implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return this.isUserActive();
     }
-    
+
     @Override
     public boolean isEnabled() {
         return this.isUserActive();

@@ -5,6 +5,7 @@ create table usuario (
                          email         text unique,
                          senha         text,
                          cpf           text,
+                         cnh text,
                          nome text,
                          contato       text,
                          tipo          text,
@@ -108,7 +109,7 @@ create table perfil_usuario(
                                foreign key (id_perfil) references perfil (id),
                                foreign key (id_usuario) references usuario (id)
 );
-
+|
 insert into perfil (nome, data_criacao, ativo) values ('CLIENTE', now(), true);
 insert into perfil (nome, data_criacao, ativo) values ('ENTREGADOR', now(), true);
 
