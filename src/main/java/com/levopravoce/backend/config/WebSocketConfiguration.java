@@ -36,8 +36,7 @@ public class WebSocketConfiguration extends AbstractSecurityWebSocketMessageBrok
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/socket").setAllowedOrigins("http://localhost:5173");
-
+        registry.addEndpoint("/socket").setAllowedOrigins("*");
     }
 
     @Override
