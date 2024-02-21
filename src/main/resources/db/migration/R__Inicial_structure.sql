@@ -130,6 +130,7 @@ create table veiculo (
                          id_tipo_veiculo bigint,
                          placa           text,
                          modelo          text,
+                         montadora text,
                          cor             text,
                          renavam         text,
                          data_criacao    timestamp default now(),

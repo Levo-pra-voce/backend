@@ -33,6 +33,12 @@ public class Vehicle {
     @Column(name = "cor")
     private String color;
 
+    @Column(name = "montadora")
+    private String manufacturer;
+
+    @Column(name = "renavam")
+    private String renavam;
+
     @Column(name = "data_criacao")
     private LocalDateTime creationDate;
 
