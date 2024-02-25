@@ -1,7 +1,9 @@
 package com.levopravoce.backend.security;
 
+import com.levopravoce.backend.entities.User;
 import java.io.IOException;
 
+import java.util.Date;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -26,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtService;
     private final UserDetailsService userService;
-    private final Integer SUBSTRING_BEARER_INDEX = 7;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -53,9 +54,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         userEmail = jwtService.getUsernameFromToken(jwt);
         if (StringUtils.isNotEmpty(userEmail)
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService
+            User userDetails = (User) userService
                     .loadUserByUsername(userEmail);
             if (jwtService.isTokenValid(jwt, userDetails)) {
+                Date expirationDate = jwtService.getExpirationDateFromToken(jwt);
+                userDetails.setExpirationDate(expirationDate);
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
