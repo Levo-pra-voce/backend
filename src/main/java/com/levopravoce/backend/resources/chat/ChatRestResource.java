@@ -15,8 +15,8 @@ public class ChatRestResource {
 
     private final ChatService chatService;
 
-    @GetMapping("/messages/{groupId}")
-    public ChatResponseDTO getAllMessagesBySender(@PathVariable Long groupId) {
-        return this.chatService.getAllMessagesBySenderAndReceiver(groupId);
-    }
+//    @GetMapping("/messages/{groupId}")
+//    public ChatResponseDTO getAllMessagesBySender(@PathVariable Long groupId) {
+//        return this.chatService.getAllMessagesBySenderAndReceiver(groupId);
+//    }
 }
