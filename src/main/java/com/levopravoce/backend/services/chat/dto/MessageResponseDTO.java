@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageResponseDTO {
-    private String sender;
+
+    private MessageType type;
     private String message;
-    private String name;
+    private String sender;
 }

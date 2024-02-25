@@ -2,6 +2,8 @@ package com.levopravoce.backend.entities;
 
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -85,6 +87,9 @@ public class User implements UserDetails {
     @JoinColumn(name = "id_usuario")
     private List<Rating> ratings;
 
+    @Transient
+    private Date expirationDate;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Optional.ofNullable
@@ -108,7 +113,11 @@ public class User implements UserDetails {
     }
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.isUserActive();
+        if (this.expirationDate == null) {
+            return true;
+        }
+
+        return this.expirationDate.after(new Date());
     }
 
     @Override
