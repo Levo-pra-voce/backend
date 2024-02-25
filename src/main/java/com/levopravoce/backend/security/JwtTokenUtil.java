@@ -16,7 +16,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtTokenUtil {
 
-	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+	// 1 week
+	public static final long JWT_TOKEN_VALIDITY_TIME = 7 * 24 * 60 * 60;
 
 	@Value("${jwt.secret}")
 	private String secret;
@@ -63,7 +64,7 @@ public class JwtTokenUtil {
 				.setClaims(claims)
 				.setSubject(subject)
 				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY_TIME * 1000))
 				.signWith(SignatureAlgorithm.HS512, this.secret).compact();
 	}
 
