@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MessageResponseDTO {
     private MessageType type;
+    private Long channelId;
     private String message;
     private String sender;
 }

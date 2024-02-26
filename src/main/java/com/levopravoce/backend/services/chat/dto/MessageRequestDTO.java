@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class MessageRequestDTO {
 
-    private Long groupId;
-    private MessageType type;
-    private String message;
-    private String name;
+  private Long groupId;
+  private Long timestamp;
+  private MessageType type;
+  private String message;
 }

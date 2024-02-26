@@ -1,7 +1,6 @@
 package com.levopravoce.backend.socket.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import java.util.Map;
 import lombok.AllArgsConstructor;

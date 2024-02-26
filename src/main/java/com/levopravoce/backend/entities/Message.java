@@ -1,6 +1,9 @@
 package com.levopravoce.backend.entities;
 
+import com.levopravoce.backend.services.chat.dto.MessageResponseDTO;
+import com.levopravoce.backend.services.chat.dto.MessageType;
 import jakarta.persistence.*;
+import java.util.Base64;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -25,7 +28,7 @@ public class Message {
 
     @Column(name = "tipo_mensagem")
     @Enumerated(EnumType.STRING)
-    private MESSAGE_TYPE messageType;
+    private MessageType messageType;
 
     @Column(name = "data_criacao")
     private LocalDateTime date;
@@ -42,8 +45,21 @@ public class Message {
     @JoinColumn(name = "id_grupo")
     private Group group;
 
-    enum MESSAGE_TYPE {
-        TEXT,
-        FILE
+    public MessageResponseDTO toMessageResponseDTO() {
+
+        String message = switch (this.messageType) {
+            case TEXT -> new String(this.message);
+            case IMAGE -> {
+                Base64.Encoder encoder = Base64.getEncoder();
+                yield encoder.encodeToString(this.message);
+            }
+        };
+
+        return MessageResponseDTO.builder()
+            .message(message)
+            .sender(this.sender.getEmail())
+            .channelId(this.group.getId())
+            .type(this.messageType)
+            .build();
     }
 }
