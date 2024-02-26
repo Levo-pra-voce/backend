@@ -1,5 +1,6 @@
 package com.levopravoce.backend.services.chat;
 
+import com.levopravoce.backend.common.WebSocketUtils;
 import com.levopravoce.backend.repository.MessageRepository;
 import com.levopravoce.backend.services.chat.dto.MessageRequestDTO;
 import com.levopravoce.backend.services.chat.dto.MessageResponseDTO;
@@ -9,6 +10,7 @@ import com.levopravoce.backend.socket.WebSocketMessageService;
 import com.levopravoce.backend.socket.dto.WebSocketEventDTO;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -18,6 +20,7 @@ import org.springframework.web.socket.TextMessage;
 public class ChatService implements WebSocketMessageService<MessageRequestDTO> {
 
   private final MessageRepository messageRepository;
+  private final WebSocketUtils webSocketUtils;
 
   @Override
   public void handleMessage(WebSocketEventDTO eventDTO, WebSocketHandler webSocketHandler,
@@ -28,7 +31,14 @@ public class ChatService implements WebSocketMessageService<MessageRequestDTO> {
         .message(messageRequest.getMessage())
         .build();
 
-    sendMessage(userIds, messageResponse, webSocketHandler);
+    if (eventDTO.getSender() != null) {
+      var userID = eventDTO.getSender().getId();
+      sendMessage(userIds, userID, messageResponse, webSocketHandler);
+      return;
+    }
+
+    sendErrorMessage(webSocketHandler, eventDTO, "Erro ao mandar a mensagem",
+        "Usuário não encontrado");
   }
 
   @Override
@@ -53,10 +63,13 @@ public class ChatService implements WebSocketMessageService<MessageRequestDTO> {
 
   public void sendMessage(
       List<Long> userIds,
+      Long sendUserId,
       MessageResponseDTO messageResponse,
       WebSocketHandler webSocketHandler
   ) {
-    userIds.forEach(
+    userIds.stream().filter(
+        userId -> !Objects.equals(userId, sendUserId)
+    ).forEach(
         userId -> {
           var userSessions = webSocketHandler.userToActiveSessions.get(userId);
           if (userSessions != null) {
@@ -66,7 +79,8 @@ public class ChatService implements WebSocketMessageService<MessageRequestDTO> {
                     try {
                       session.sendMessage(new TextMessage(messageResponse.getMessage()));
                     } catch (IOException e) {
-                      throw new RuntimeException(e);
+                      webSocketUtils.sendErrorMessage(session, "Erro ao mandar a mensagem",
+                          e.getMessage());
                     }
                   }
                 }
@@ -74,5 +88,19 @@ public class ChatService implements WebSocketMessageService<MessageRequestDTO> {
           }
         }
     );
+  }
+
+  public void sendErrorMessage(
+      WebSocketHandler webSocketHandler,
+      WebSocketEventDTO eventDTO,
+      String message,
+      String error
+  ) {
+    var userSessions = webSocketHandler.userToActiveSessions.get(eventDTO.getSender().getId());
+    if (userSessions != null) {
+      userSessions.forEach(
+          session -> webSocketUtils.sendErrorMessage(session, message, error)
+      );
+    }
   }
 }
