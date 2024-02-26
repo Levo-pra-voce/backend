@@ -2,6 +2,7 @@ package com.levopravoce.backend.socket.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.levopravoce.backend.entities.User;
+import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class WebSocketEventDTO {
 
   private Map<String, String> headers;
   private String body;
-  private User sender;
+  private UserDTO sender;
 
   public Boolean isValid() {
     return headers != null && headers.containsKey("destination") && body != null;

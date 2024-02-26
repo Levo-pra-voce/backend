@@ -140,6 +140,7 @@ public class User implements UserDetails {
 
     public UserDTO toDTO() {
         return UserDTO.builder()
+            .id(this.id)
                 .email(this.email)
             .name(this.name)
                 .cpf(this.cpf)

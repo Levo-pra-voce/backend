@@ -74,7 +74,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
       throw new RuntimeException("No handler found for destination: " + headers.get("destination"));
     }
 
-    webSocketEventDTO.setSender(user);
+    webSocketEventDTO.setSender(user.toDTO());
 
     Object messageDTO = this.objectMapper.readValue(webSocketEventDTO.getBody(),
         webSocketMessageService.getMessageType());
