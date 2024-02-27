@@ -59,6 +59,7 @@ public class ChatSocketService implements WebSocketMessageService<MessageRequest
           .message(messageBytes)
           .messageType(messageRequest.getType())
           .group(messageRepository.getGroupById(messageRequest.getGroupId()))
+          .sender(eventDTO.getSender().toEntity())
           .build()
       );
 
