@@ -1,8 +1,7 @@
 package com.levopravoce.backend.resources.chat;
 
 import com.levopravoce.backend.services.chat.ChatService;
-import com.levopravoce.backend.services.chat.dto.ChatResponseDTO;
-import com.levopravoce.backend.services.chat.dto.MessageResponseDTO;
+import com.levopravoce.backend.services.chat.dto.MessageDTO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +17,7 @@ public class ChatResource {
     private final ChatService chatService;
 
     @GetMapping("/messages/{groupId}")
-    public List<MessageResponseDTO> getAllMessagesBySender(@PathVariable Long groupId) {
+    public List<MessageDTO> getAllMessagesBySender(@PathVariable Long groupId) {
         return this.chatService.getAllByChannelId(groupId);
     }
 }

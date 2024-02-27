@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageResponseDTO {
-    private MessageType type;
-    private Long channelId;
-    private String message;
-    private String sender;
+public class MessageDTO {
+
+  private MessageType type;
+  private Long channelId;
+  private Long timestamp;
+  private String message;
+  private String sender;
 }

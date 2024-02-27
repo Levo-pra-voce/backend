@@ -1,12 +1,25 @@
 package com.levopravoce.backend.entities;
 
-import com.levopravoce.backend.services.chat.dto.MessageResponseDTO;
+import com.levopravoce.backend.services.chat.dto.MessageDTO;
 import com.levopravoce.backend.services.chat.dto.MessageType;
-import jakarta.persistence.*;
-import java.util.Base64;
-import lombok.*;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Base64;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "mensagem")
@@ -45,7 +58,7 @@ public class Message {
     @JoinColumn(name = "id_grupo")
     private Group group;
 
-    public MessageResponseDTO toMessageResponseDTO() {
+    public MessageDTO toMessageDTO() {
 
         String message = switch (this.messageType) {
             case TEXT -> new String(this.message);
@@ -55,7 +68,7 @@ public class Message {
             }
         };
 
-        return MessageResponseDTO.builder()
+        return MessageDTO.builder()
             .message(message)
             .sender(this.sender.getEmail())
             .channelId(this.group.getId())

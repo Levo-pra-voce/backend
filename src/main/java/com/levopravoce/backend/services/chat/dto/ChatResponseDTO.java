@@ -6,7 +6,8 @@ import java.util.List;
 
 @Data
 public class ChatResponseDTO {
-    private List<MessageResponseDTO> messages;
+
+    private List<MessageDTO> messages;
     private String sender;
     private String receiver;
     private String name;

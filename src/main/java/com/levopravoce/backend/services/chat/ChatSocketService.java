@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.levopravoce.backend.common.WebSocketUtils;
 import com.levopravoce.backend.entities.Message;
 import com.levopravoce.backend.repository.MessageRepository;
-import com.levopravoce.backend.services.chat.dto.MessageRequestDTO;
-import com.levopravoce.backend.services.chat.dto.MessageResponseDTO;
+import com.levopravoce.backend.services.chat.dto.MessageDTO;
 import com.levopravoce.backend.socket.WebSocketDestination;
 import com.levopravoce.backend.socket.WebSocketHandler;
 import com.levopravoce.backend.socket.WebSocketMessageService;
@@ -23,7 +22,7 @@ import org.springframework.web.socket.TextMessage;
 
 @Service
 @RequiredArgsConstructor
-public class ChatSocketService implements WebSocketMessageService<MessageRequestDTO> {
+public class ChatSocketService implements WebSocketMessageService<MessageDTO> {
 
   private final MessageRepository messageRepository;
   private final WebSocketUtils webSocketUtils;
@@ -32,8 +31,8 @@ public class ChatSocketService implements WebSocketMessageService<MessageRequest
   @Override
   public void handleMessage(WebSocketEventDTO eventDTO, WebSocketHandler webSocketHandler,
       Object message) {
-    MessageRequestDTO messageRequest = (MessageRequestDTO) message;
-    List<Long> userIds = messageRepository.getUsersIdsByGroup(messageRequest.getGroupId());
+    MessageDTO messageRequest = (MessageDTO) message;
+    List<Long> userIds = messageRepository.getUsersIdsByGroup(messageRequest.getChannelId());
     if (eventDTO.getSender() != null) {
       Optional<String> errorMessage = validateMessage(messageRequest);
       if (errorMessage.isPresent()) {
@@ -58,16 +57,17 @@ public class ChatSocketService implements WebSocketMessageService<MessageRequest
           .active(true)
           .message(messageBytes)
           .messageType(messageRequest.getType())
-          .group(messageRepository.getGroupById(messageRequest.getGroupId()))
+          .group(messageRepository.getGroupById(messageRequest.getChannelId()))
           .sender(eventDTO.getSender().toEntity())
           .build()
       );
 
-      MessageResponseDTO messageResponse = MessageResponseDTO.builder()
+      MessageDTO messageResponse = MessageDTO.builder()
           .message(messageRequest.getMessage())
           .type(messageRequest.getType())
           .sender(eventDTO.getSender().getEmail())
-          .channelId(messageRequest.getGroupId())
+          .timestamp(messageRequest.getTimestamp())
+          .channelId(messageRequest.getChannelId())
           .build();
 
       var userID = eventDTO.getSender().getId();
@@ -81,11 +81,11 @@ public class ChatSocketService implements WebSocketMessageService<MessageRequest
 
   @Override
   public boolean hasPermission(WebSocketEventDTO eventDTO, Object message) {
-    MessageRequestDTO messageRequest = (MessageRequestDTO) message;
-    if (messageRequest.getGroupId() == null) {
+    MessageDTO messageRequest = (MessageDTO) message;
+    if (messageRequest.getChannelId() == null) {
       return false;
     }
-    return this.messageRepository.haveAccessForGroup(messageRequest.getGroupId(),
+    return this.messageRepository.haveAccessForGroup(messageRequest.getChannelId(),
         eventDTO.getSender().getId());
   }
 
@@ -95,14 +95,15 @@ public class ChatSocketService implements WebSocketMessageService<MessageRequest
   }
 
   @Override
-  public Class<MessageRequestDTO> getMessageType() {
-    return MessageRequestDTO.class;
+  public Class<MessageDTO> getMessageType() {
+    return MessageDTO.class;
   }
 
   private void sendMessage(
       List<Long> userIds,
       Long sendUserId,
-      MessageResponseDTO messageResponse,
+      MessageDTO
+          messageResponse,
       WebSocketHandler webSocketHandler
   ) {
     userIds.stream().filter(
@@ -143,11 +144,11 @@ public class ChatSocketService implements WebSocketMessageService<MessageRequest
     }
   }
 
-  private Optional<String> validateMessage(MessageRequestDTO messageRequest) {
+  private Optional<String> validateMessage(MessageDTO messageRequest) {
     if (messageRequest.getMessage() == null || messageRequest.getMessage().isEmpty()) {
       return Optional.of("Message cannot be empty");
     }
-    if (messageRequest.getGroupId() == null) {
+    if (messageRequest.getChannelId() == null) {
       return Optional.of("Group id cannot be empty");
     }
 
