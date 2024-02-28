@@ -2,6 +2,7 @@ package com.levopravoce.backend.repository;
 
 import com.levopravoce.backend.entities.Group;
 import com.levopravoce.backend.entities.Message;
+import com.levopravoce.backend.services.chat.dto.MessageDTO;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,9 +33,10 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
   @Query(
       value = """
-              SELECT m.message, m.date, m.messageType, m.group.id
+              SELECT m, g
                   FROM Message m
-                      WHERE m.group.id = :channelId
+                        JOIN Group g on g.id = m.sender.id
+                    WHERE m.sender.id = :channelId
           """
   )
   List<Message> getAllByChannelId(Long channelId);
