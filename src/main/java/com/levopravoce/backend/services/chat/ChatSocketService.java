@@ -81,12 +81,14 @@ public class ChatSocketService implements WebSocketMessageService<MessageDTO> {
 
   @Override
   public boolean hasPermission(WebSocketEventDTO eventDTO, Object message) {
-    MessageDTO messageRequest = (MessageDTO) message;
-    if (messageRequest.getChannelId() == null) {
-      return false;
+    if (message instanceof MessageDTO messageRequest) {
+      if (messageRequest.getChannelId() == null) {
+        return false;
+      }
+      return this.messageRepository.haveAccessForGroup(messageRequest.getChannelId(),
+          eventDTO.getSender().getId());
     }
-    return this.messageRepository.haveAccessForGroup(messageRequest.getChannelId(),
-        eventDTO.getSender().getId());
+    return false;
   }
 
   @Override
