@@ -10,8 +10,9 @@ import com.levopravoce.backend.socket.WebSocketHandler;
 import com.levopravoce.backend.socket.WebSocketMessageService;
 import com.levopravoce.backend.socket.dto.WebSocketEventDTO;
 import java.io.IOException;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -52,8 +53,10 @@ public class ChatSocketService implements WebSocketMessageService<MessageDTO> {
       this.messageRepository.save(Message.builder()
           .date(Optional
               .ofNullable(messageRequest.getTimestamp())
-              .map(Timestamp::new)
-              .map(Timestamp::toLocalDateTime).orElse(LocalDateTime.now()))
+              .map(timestamp -> LocalDateTime.ofInstant(
+                  Instant.ofEpochSecond(timestamp),
+                  ZoneId.of("UTC")
+              )).orElse(LocalDateTime.now()))
           .active(true)
           .message(messageBytes)
           .messageType(messageRequest.getType())
