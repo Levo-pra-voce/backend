@@ -16,8 +16,14 @@ public class ChatResource {
 
     private final ChatService chatService;
 
-    @GetMapping("/messages/{groupId}")
-    public List<MessageDTO> getAllMessagesBySender(@PathVariable Long groupId) {
-        return this.chatService.getAllByChannelId(groupId);
+    @GetMapping("/messages/{channelId}")
+    public List<MessageDTO> getAllMessagesBySender(@PathVariable Long channelId) {
+        return this.chatService.getAllByChannelId(channelId);
+    }
+
+    @GetMapping("/messages/{channelId}/{timestamp}")
+    public List<MessageDTO> getAllMessagesBySender(@PathVariable Long channelId,
+        @PathVariable Long timestamp) {
+        return this.chatService.getAllByChannelIdAndTimestamp(channelId, timestamp);
     }
 }

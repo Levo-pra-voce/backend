@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -72,6 +73,7 @@ public class Message {
             .message(message)
             .sender(this.sender.getEmail())
             .channelId(this.group.getId())
+            .timestamp(this.date.atZone(ZoneId.of("UTC")).toEpochSecond())
             .type(this.messageType)
             .build();
     }
