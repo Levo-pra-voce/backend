@@ -52,6 +52,8 @@ create table usuario_grupo (
                                foreign key (id_grupo) references grupo (id)
 );
 
+drop index if exists idx_usuario_grupo_id_grupo;
+create index idx_usuario_grupo_id_usuario on usuario_grupo (id_usuario);
 
 drop table if exists mensagem;
 
