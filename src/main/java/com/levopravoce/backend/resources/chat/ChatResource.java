@@ -1,6 +1,7 @@
 package com.levopravoce.backend.resources.chat;
 
 import com.levopravoce.backend.services.chat.ChatService;
+import com.levopravoce.backend.services.chat.dto.ChatUserDTO;
 import com.levopravoce.backend.services.chat.dto.MessageDTO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,16 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatResource {
 
-    private final ChatService chatService;
+  private final ChatService chatService;
 
-    @GetMapping("/messages/{channelId}")
-    public List<MessageDTO> getAllMessagesBySender(@PathVariable Long channelId) {
-        return this.chatService.getAllByChannelId(channelId);
-    }
+  @GetMapping("/messages/{channelId}")
+  public List<MessageDTO> getAllMessagesBySender(@PathVariable Long channelId) {
+    return this.chatService.getAllByChannelId(channelId);
+  }
 
-    @GetMapping("/messages/{channelId}/{timestamp}")
-    public List<MessageDTO> getAllMessagesBySender(@PathVariable Long channelId,
-        @PathVariable Long timestamp) {
-        return this.chatService.getAllByChannelIdAndTimestamp(channelId, timestamp);
-    }
+  @GetMapping("/messages/{channelId}/{timestamp}")
+  public List<MessageDTO> getAllMessagesBySender(@PathVariable Long channelId,
+      @PathVariable Long timestamp) {
+    return this.chatService.getAllByChannelIdAndTimestamp(channelId, timestamp);
+  }
+
+  @GetMapping("/list")
+  public List<ChatUserDTO> getChatListByCurrentUser() {
+    return this.chatService.getChatListByCurrentUser();
+  }
 }

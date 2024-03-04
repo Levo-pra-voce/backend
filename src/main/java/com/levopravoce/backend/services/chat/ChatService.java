@@ -3,6 +3,7 @@ package com.levopravoce.backend.services.chat;
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.Message;
 import com.levopravoce.backend.repository.MessageRepository;
+import com.levopravoce.backend.services.chat.dto.ChatUserDTO;
 import com.levopravoce.backend.services.chat.dto.MessageDTO;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -43,5 +44,12 @@ public class ChatService {
     if (!messageRepository.haveAccessForGroup(groupId, userId)) {
       throw new RuntimeException("User does not have access to this channel");
     }
+  }
+
+  public List<ChatUserDTO> getChatListByCurrentUser() {
+    var userId = SecurityUtils.getCurrentUserId().orElseThrow(
+        () -> new RuntimeException("User not found")
+    );
+    return messageRepository.getChatListByCurrentUser(userId);
   }
 }

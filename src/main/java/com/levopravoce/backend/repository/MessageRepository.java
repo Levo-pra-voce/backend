@@ -2,6 +2,7 @@ package com.levopravoce.backend.repository;
 
 import com.levopravoce.backend.entities.Group;
 import com.levopravoce.backend.entities.Message;
+import com.levopravoce.backend.services.chat.dto.ChatUserDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,18 +15,15 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
   @Query(value = """
               SELECT distinct ug.id_usuario
                   FROM public.usuario_grupo ug
-                      WHERE ug.id_grupo = :groupId
+              WHERE ug.id_grupo = :groupId
       """, nativeQuery = true)
   List<Long> getUsersIdsByGroup(Long groupId);
 
   @Query(
       value = """
-              SELECT
-                  EXISTS (
-                          SELECT 1
-                              FROM public.usuario_grupo m
-                          WHERE m.id_grupo = :groupId and m.id_usuario = :userId
-                      )
+              SELECT true
+                    FROM public.usuario_grupo m
+              WHERE m.id_grupo = :groupId and m.id_usuario = :userId
           """,
       nativeQuery = true
   )
@@ -36,7 +34,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
               SELECT m, g
                   FROM Message m
                         JOIN Group g on g.id = m.group.id
-                    WHERE m.group.id = :channelId
+                    WHERE m.group.id = :channelId and g.active = true
                ORDER BY m.date
           """
   )
@@ -47,7 +45,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
               SELECT m, g
                   FROM Message m
                         JOIN Group g on g.id = m.group.id
-                    WHERE m.group.id = :channelId and m.date > :lastDate
+                    WHERE m.group.id = :channelId and g.active = true and m.date > :lastDate
                ORDER BY m.date
           """
   )
@@ -57,8 +55,11 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
       value = """
               SELECT g
                   FROM Group g
-                      WHERE g.id = :groupId
+                      WHERE g.id = :groupId and g.active = true
           """
   )
   Group getGroupById(Long groupId);
+
+  @Query(nativeQuery = true)
+  List<ChatUserDTO> getChatListByCurrentUser(Long userId);
 }
