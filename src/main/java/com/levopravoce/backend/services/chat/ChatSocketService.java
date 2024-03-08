@@ -3,6 +3,7 @@ package com.levopravoce.backend.services.chat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.levopravoce.backend.common.WebSocketUtils;
 import com.levopravoce.backend.entities.Message;
+import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.repository.MessageRepository;
 import com.levopravoce.backend.services.chat.dto.MessageDTO;
 import com.levopravoce.backend.socket.WebSocketDestination;
@@ -15,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,55 +31,51 @@ public class ChatSocketService implements WebSocketMessageService<MessageDTO> {
 
   @Override
   public void handleMessage(WebSocketEventDTO eventDTO, WebSocketHandler webSocketHandler,
+      User currentUserSession,
       Object message) {
     MessageDTO messageRequest = (MessageDTO) message;
-    List<Long> userIds = messageRepository.getUsersIdsByGroup(messageRequest.getChannelId());
-    if (eventDTO.getSender() != null) {
-      Optional<String> errorMessage = validateMessage(messageRequest);
-      if (errorMessage.isPresent()) {
-        sendErrorMessage(webSocketHandler, eventDTO, "Erro ao mandar a mensagem",
-            errorMessage.get());
-        return;
-      }
+    messageRequest.setSender(currentUserSession.getEmail());
 
-      byte[] messageBytes = switch (messageRequest.getType()) {
-        case TEXT -> messageRequest.getMessage().getBytes();
-        case IMAGE -> {
-          Base64.Decoder decoder = Base64.getDecoder();
-          yield decoder.decode(messageRequest.getMessage());
-        }
-      };
-
-      this.messageRepository.save(Message.builder()
-          .date(Optional
-              .ofNullable(messageRequest.getTimestamp())
-              .map(timestamp -> LocalDateTime.ofInstant(
-                  Instant.ofEpochSecond(timestamp),
-                  ZoneId.of("UTC")
-              )).orElse(LocalDateTime.now()))
-          .active(true)
-          .message(messageBytes)
-          .messageType(messageRequest.getType())
-          .group(messageRepository.getGroupById(messageRequest.getChannelId()))
-          .sender(eventDTO.getSender().toEntity())
-          .build()
-      );
-
-      MessageDTO messageResponse = MessageDTO.builder()
-          .message(messageRequest.getMessage())
-          .type(messageRequest.getType())
-          .sender(eventDTO.getSender().getEmail())
-          .timestamp(messageRequest.getTimestamp())
-          .channelId(messageRequest.getChannelId())
-          .build();
-
-      var userID = eventDTO.getSender().getId();
-      sendMessage(userIds, userID, messageResponse, webSocketHandler);
+    Optional<String> errorMessage = validateMessage(messageRequest);
+    if (errorMessage.isPresent()) {
+      sendErrorMessage(webSocketHandler, eventDTO, "Erro ao mandar a mensagem",
+          errorMessage.get());
       return;
     }
 
-    sendErrorMessage(webSocketHandler, eventDTO, "Erro ao mandar a mensagem",
-        "Usuário não encontrado");
+    byte[] messageBytes = switch (messageRequest.getType()) {
+      case TEXT -> messageRequest.getMessage().getBytes();
+      case IMAGE -> {
+        Base64.Decoder decoder = Base64.getDecoder();
+        yield decoder.decode(messageRequest.getMessage());
+      }
+    };
+
+    this.messageRepository.save(Message.builder()
+        .date(Optional
+            .ofNullable(messageRequest.getTimestamp())
+            .map(timestamp -> LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(timestamp),
+                ZoneId.of("UTC")
+            )).orElse(LocalDateTime.now()))
+        .active(true)
+        .message(messageBytes)
+        .messageType(messageRequest.getType())
+        .group(messageRepository.getGroupById(messageRequest.getChannelId()))
+        .sender(eventDTO.getSender().toEntity())
+        .build()
+    );
+
+    MessageDTO messageResponse = MessageDTO.builder()
+        .message(messageRequest.getMessage())
+        .type(messageRequest.getType())
+        .sender(eventDTO.getSender().getEmail())
+        .timestamp(messageRequest.getTimestamp())
+        .channelId(messageRequest.getChannelId())
+        .build();
+
+    List<Long> userIds = messageRepository.getUsersIdsByGroup(messageRequest.getChannelId());
+    sendMessage(userIds, messageResponse, webSocketHandler);
   }
 
   @Override
@@ -106,14 +102,11 @@ public class ChatSocketService implements WebSocketMessageService<MessageDTO> {
 
   private void sendMessage(
       List<Long> userIds,
-      Long sendUserId,
       MessageDTO
           messageResponse,
       WebSocketHandler webSocketHandler
   ) {
-    userIds.stream().filter(
-        userId -> !Objects.equals(userId, sendUserId)
-    ).forEach(
+    userIds.forEach(
         userId -> {
           var userSessions = webSocketHandler.userToActiveSessions.get(userId);
           if (userSessions != null) {

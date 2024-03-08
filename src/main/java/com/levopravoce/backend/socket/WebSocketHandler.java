@@ -82,7 +82,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
       throw new RuntimeException("No permission for user: " + principal);
     }
 
-    webSocketMessageService.handleMessage(webSocketEventDTO, this, messageDTO);
+    webSocketMessageService.handleMessage(webSocketEventDTO, this, user, messageDTO);
   }
 
   @Override
