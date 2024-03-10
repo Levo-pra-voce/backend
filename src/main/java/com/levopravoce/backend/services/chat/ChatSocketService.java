@@ -52,12 +52,9 @@ public class ChatSocketService implements WebSocketMessageService<MessageDTO> {
     };
 
     this.messageRepository.save(Message.builder()
-        .date(Optional
-            .ofNullable(messageRequest.getTimestamp())
-            .map(timestamp -> LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(timestamp),
-                ZoneId.of("UTC")
-            )).orElse(LocalDateTime.now()))
+        .date(LocalDateTime
+            .ofInstant(Instant.ofEpochMilli(System.currentTimeMillis()),
+                ZoneId.of("UTC")))
         .active(true)
         .message(messageBytes)
         .messageType(messageRequest.getType())
@@ -152,10 +149,6 @@ public class ChatSocketService implements WebSocketMessageService<MessageDTO> {
 
     if (messageRequest.getType() == null) {
       return Optional.of("Message type cannot be empty");
-    }
-
-    if (messageRequest.getTimestamp() == null) {
-      return Optional.of("Timestamp cannot be empty");
     }
 
     return Optional.empty();
