@@ -29,6 +29,7 @@ dependencies {
     implementation("org.postgresql:postgresql")
 
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
+    implementation("io.jsonwebtoken:jjwt-impl:0.12.5")
 
     implementation("javax.xml.bind:jaxb-api:2.3.1")
     implementation("org.springframework.boot:spring-boot-starter-websocket")

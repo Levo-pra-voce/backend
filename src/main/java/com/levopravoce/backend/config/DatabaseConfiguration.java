@@ -2,93 +2,91 @@ package com.levopravoce.backend.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.util.Properties;
-import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypes;
+import org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypesScanner;
+import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableJpaRepositories(basePackages = "com.levopravoce.backend.repository")
 @EnableTransactionManagement
+@EntityScan(basePackages = "com.levopravoce.backend.*")
+@ComponentScan(basePackages = "com.levopravoce.backend.*")
 public class DatabaseConfiguration {
+    @Bean
+    @ConfigurationProperties("spring.datasource")
+    HikariConfig dbProps() {
+        return new HikariConfig();
+    }
 
-  @Value("${spring.jpa.properties.hibernate.dialect}")
-  private String dialect;
+    @Bean
+    public DataSource dataSource(HikariConfig hikariConfig) {
+        return new HikariDataSource(hikariConfig);
+    }
 
-  @Value("${spring.jpa.hibernate.ddl-auto}")
-  private String ddlAuto;
+    @Bean
+    LocalContainerEntityManagerFactoryBean entityManagerFactory(
+            DataSource dataSource,
+            EntityManagerFactoryBuilder builder,
+            PersistenceManagedTypes persistenceManagedTypes
+    ) {
+        return builder.dataSource(dataSource)
+                .packages("com.levopravoce.backend.entities.*")
+                .managedTypes(persistenceManagedTypes)
+                .build();
+    }
 
-  @Value("${spring.datasource.url}")
-  private String dbUrl;
+    @Bean
+    PlatformTransactionManager transactionManager(
+            LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
+        return transactionManager;
+    }
 
-  @Value("${spring.datasource.driver-class-name}")
-  private String driverClassName;
+    @Bean
+    public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
+        return new PersistenceExceptionTranslationPostProcessor();
+    }
 
-  @Value("${spring.datasource.username}")
-  private String username;
+    @Bean
+    public EntityManagerFactoryBuilder builder(ObjectProvider<PersistenceUnitManager> persistenceUnitManager,
+                                               JpaProperties jpaProperties
+    ) {
+        return new EntityManagerFactoryBuilder(new HibernateJpaVendorAdapter(),
+                jpaProperties.getProperties(),
+                persistenceUnitManager.getIfAvailable()
+        );
+    }
 
-  @Value("${spring.datasource.password}")
-  private String password;
+    @Bean
+    @ConfigurationProperties(prefix = "spring")
+    JpaProperties jpaProperties() {
+        return new JpaProperties();
+    }
 
-  @Bean
-  public DataSource dataSource() {
-    HikariConfig config = new HikariConfig();
-    config.setJdbcUrl(dbUrl);
-    config.setUsername(username);
-    config.setPassword(password);
-    config.setDriverClassName(driverClassName);
-    return new HikariDataSource(config);
-  }
-
-  @Bean
-  @ConfigurationProperties("spring.datasource")
-  DataSourceProperties dataSourceProperties() {
-    return new DataSourceProperties();
-  }
-
-  @Bean
-  LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-    LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-    em.setDataSource(dataSource);
-    em.setPackagesToScan("com.levopravoce.backend.entities");
-
-    JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-    em.setJpaVendorAdapter(vendorAdapter);
-    em.setJpaProperties(additionalProperties());
-
-    return em;
-  }
-
-  @Bean
-  PlatformTransactionManager transactionManager(
-      LocalContainerEntityManagerFactoryBean entityManagerFactory) {
-    JpaTransactionManager transactionManager = new JpaTransactionManager();
-    transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
-
-    return transactionManager;
-  }
-
-  @Bean
-  public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
-    return new PersistenceExceptionTranslationPostProcessor();
-  }
-
-  Properties additionalProperties() {
-    Properties properties = new Properties();
-    properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);
-    properties.setProperty("hibernate.dialect", dialect);
-
-    return properties;
-  }
+    @Bean
+    PersistenceManagedTypes persistenceManagedTypes(
+            ResourceLoader resourceLoader
+    ) {
+        return new PersistenceManagedTypesScanner(resourceLoader)
+                .scan("com.levopravoce.backend.entities");
+    }
 }

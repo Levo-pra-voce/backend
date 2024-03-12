@@ -23,15 +23,6 @@ public class JwtTokenUtil {
   @Value("${jwt.secret}")
   private String secret;
 
-
-  private SecretKey secretKey;
-
-
-  @PostConstruct
-  protected void init() {
-    this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
-  }
-
   //retrieve username from jwt token
   public String getUsernameFromToken(String token) {
     return getInfoFromToken(token, Claims::getSubject);
@@ -50,7 +41,8 @@ public class JwtTokenUtil {
   //for retrieveing any information from token we will need the secret key
   private Claims getAllClaimsFromToken(String token) {
 //		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+//    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+    return null;
   }
 
   //check if the token has expired
