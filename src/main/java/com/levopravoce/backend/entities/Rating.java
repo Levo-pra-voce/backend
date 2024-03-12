@@ -7,7 +7,6 @@ import lombok.*;
 @Table(name = "avaliacao")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rating {

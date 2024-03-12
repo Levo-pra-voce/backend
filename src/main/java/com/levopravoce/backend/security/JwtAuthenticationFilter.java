@@ -1,27 +1,22 @@
 package com.levopravoce.backend.security;
 
 import com.levopravoce.backend.entities.User;
-import java.io.IOException;
-
-import java.util.Date;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
@@ -34,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = ObjectUtils.firstNonNull(
+        String authHeader = firstNonNull(
             getJwtFromCookie(request),
             request.getHeader("Authorization"),
             request.getParameter("jwt")
@@ -46,13 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String jwt;
         final String userEmail;
-        if (authHeader == null || StringUtils.isEmpty(authHeader)) {
+        if (authHeader == null || authHeader.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
         jwt = authHeader.substring(7);
         userEmail = jwtService.getUsernameFromToken(jwt);
-        if (StringUtils.isNotEmpty(userEmail)
+        if (userEmail != null && !userEmail.isEmpty()
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             User userDetails = (User) userService
                     .loadUserByUsername(userEmail);
@@ -81,6 +76,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals("jwt") && cookie.isHttpOnly()) {
                 return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    private <T> T firstNonNull(T... values) {
+        for (T value : values) {
+            if (value != null) {
+                return value;
             }
         }
         return null;

@@ -10,7 +10,6 @@ import java.util.List;
 @Table(name = "perfil")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Profile {

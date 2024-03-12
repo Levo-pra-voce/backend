@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Table(name = "tipo_veiculo")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class VehicleType {

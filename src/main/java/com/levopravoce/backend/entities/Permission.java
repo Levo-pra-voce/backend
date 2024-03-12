@@ -10,7 +10,6 @@ import java.util.List;
 @Table(name = "permissao")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Permission {

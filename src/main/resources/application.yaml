@@ -1,10 +1,3 @@
-logging:
-  level:
-    org.hibernate: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type: TRACE
-
 spring:
   jpa:
     database: postgresql
@@ -30,7 +23,7 @@ spring:
     schemas: public
     baseline-on-migrate: true
 jwt:
-  secret: secret
+  secret: tn*KVXNLyr7To*VVhuffe!T223iE3e^qns^E^Mf
 
 server:
   port: 8888

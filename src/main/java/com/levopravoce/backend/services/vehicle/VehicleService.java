@@ -8,10 +8,10 @@ import com.levopravoce.backend.repository.UserRepository;
 import com.levopravoce.backend.repository.VehicleRepository;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

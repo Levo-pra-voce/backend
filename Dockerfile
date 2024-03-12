@@ -1,13 +1,26 @@
-FROM eclipse-temurin:17-jdk-jammy as builder
-WORKDIR /opt/app
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline
-COPY ./src ./src
-RUN ./mvnw clean install -DskipTests
- 
-FROM eclipse-temurin:17-jre-jammy
-WORKDIR /opt/app
-EXPOSE 8080
-COPY --from=builder /opt/app/target/*.jar /opt/app/*.jar
-ENTRYPOINT ["java", "-jar", "/opt/app/*.jar" ]
+FROM ghcr.io/graalvm/jdk:22.3.3 AS build
+
+# Update package lists and Install Maven
+RUN microdnf update -y && \
+microdnf install -y maven gcc glibc-devel zlib-devel libstdc++-devel gcc-c++ && \
+microdnf clean all
+
+WORKDIR /usr/src/app
+
+# Copy pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+COPY . .
+
+RUN mvn -Pnative -Pproduction native:compile
+
+# Second stage: Lightweight debian-slim image
+FROM debian:bookworm-slim
+
+WORKDIR /app1'
+# Copy the native binary from the build stage
+COPY --from=build /usr/src/app/target/backend /app/backend
+
+# Run the application
+CMD ["/app/backend"]
