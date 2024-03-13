@@ -1,4 +1,14 @@
 services:
+  api:
+    build: .
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_JDBCURL=jdbc:postgresql://postgres:5432/postgres
+    depends_on:
+      - postgres
+    expose:
+      - "8080"
+
   postgres:
     container_name: postgres-levo-pra-voce
     image: postgres

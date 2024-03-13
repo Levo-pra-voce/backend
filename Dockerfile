@@ -1,26 +1,24 @@
-FROM ghcr.io/graalvm/jdk:22.3.3 AS build
+FROM ghcr.io/graalvm/native-image:ol8-java17-22 AS builder
 
-# Update package lists and Install Maven
-RUN microdnf update -y && \
-microdnf install -y maven gcc glibc-devel zlib-devel libstdc++-devel gcc-c++ && \
-microdnf clean all
+# Install tar and gzip to extract the Maven binaries
+RUN microdnf update \
+ && microdnf install --nodocs \
+    tar \
+    gzip \
+ && microdnf clean all \
+ && rm -rf /var/cache/yum
 
-WORKDIR /usr/src/app
-
-# Copy pom.xml and download dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
+WORKDIR /app
 COPY . .
+# Cache Gradle and dependencies
+RUN ./gradlew clean --no-daemon
+# Compile native executable
+RUN ./gradlew nativeCompile --no-daemon
 
-RUN mvn -Pnative -Pproduction native:compile
+# Create run image from scratch
+FROM alpine:3.14
 
-# Second stage: Lightweight debian-slim image
-FROM debian:bookworm-slim
-
-WORKDIR /app1'
-# Copy the native binary from the build stage
-COPY --from=build /usr/src/app/target/backend /app/backend
-
-# Run the application
-CMD ["/app/backend"]
+COPY --from=builder /app/build/native/nativeCompile/levo-pra-voce .
+ENTRYPOINT ["./levo-pra-voce"]
+#COPY --from=builder /app/build/native/nativeCompile/levo-pra-voce .
+#ENTRYPOINT ["/levo-pra-voce"]
