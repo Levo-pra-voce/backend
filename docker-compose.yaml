@@ -1,4 +1,17 @@
 services:
+
+  api:
+    build: .
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-levo-pra-voce:5432/postgres
+      - SPRING_DATASOURCE_JDBCURL=jdbc:postgresql://postgres-levo-pra-voce:5432/postgres
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
   postgres:
     container_name: postgres-levo-pra-voce
     image: postgres
@@ -15,4 +28,4 @@ services:
 volumes:
   postgres-data:
     name: postgres-data
-    driver: local
+    driver: bridge
