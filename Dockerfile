@@ -16,9 +16,10 @@ RUN ./gradlew clean --no-daemon
 RUN ./gradlew nativeCompile --no-daemon
 
 # Create run image from scratch
-FROM alpine:3.14
+FROM debian:12.0-slim
 
-COPY --from=builder /app/build/native/nativeCompile/levo-pra-voce .
-ENTRYPOINT ["./levo-pra-voce"]
-#COPY --from=builder /app/build/native/nativeCompile/levo-pra-voce .
-#ENTRYPOINT ["/levo-pra-voce"]
+WORKDIR /app
+# Copy the native executable
+COPY --from=builder /app/build/native/nativeCompile/levo-pra-voce /app/levo-pra-voce
+# Run the native executable
+CMD ["/app/levo-pra-voce"]
