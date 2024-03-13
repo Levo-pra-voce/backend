@@ -63,6 +63,21 @@ tasks.withType<Javadoc>() {
     options.encoding = "UTF-8"
 }
 
+java {
+    withSourcesJar()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.jar {
+    manifest {
+        attributes(
+                "Main-Class" to "com.levopravoce.backend.BackendApplication",
+        )
+    }
+}
+
 //graalvmNative {
 //    binaries {
 //        named("main") {
