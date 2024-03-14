@@ -24,7 +24,7 @@ spring:
     schemas: public
     baseline-on-migrate: true
 jwt:
-  secret: tn*KVXNLyr7To*VVhuffe!T223iE3e^qns^E^Mf
+  secret: tnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7To
 
 server:
   port: 8888
