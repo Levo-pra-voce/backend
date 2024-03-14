@@ -65,11 +65,11 @@ public class JwtTokenUtil {
   private String doGenerateToken(Map<String, Object> claims, String subject) {
 
     return Jwts.builder()
-        .setClaims(claims)
-        .setSubject(subject)
-        .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY_TIME * 1000))
-        .signWith(SignatureAlgorithm.HS512, this.secret).compact();
+        .claims(claims)
+        .subject(subject)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY_TIME * 1000))
+        .signWith(SignatureAlgorithm.HS256, this.secret).compact();
   }
 
   //validate token
