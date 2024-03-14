@@ -1,4 +1,10 @@
+logging:
+  file:
+    name: /tmp/logs/spring-boot-logging.log
+
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect

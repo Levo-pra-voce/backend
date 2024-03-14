@@ -9,6 +9,7 @@ import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
 import com.levopravoce.backend.services.user.UserManagementDeciderService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class AuthenticateService {
   private final AuthenticationManager authenticationManager;
   private final UserManagementDeciderService userManagementDeciderService;
 
+  @SneakyThrows
   public JwtResponseDTO signin(UserDTO dto) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
