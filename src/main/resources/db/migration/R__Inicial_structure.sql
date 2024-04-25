@@ -171,25 +171,6 @@ create table pagamento (
                            foreign key (id_grupo) references grupo (id)
 );
 
-drop table if exists carga cascade;
-
-create table carga
-(
-    id           bigserial primary key,
-    id_usuario   bigint,
-    id_veiculo   bigint,
-    id_pagamento bigint,
-    descricao    text,
-    peso         numeric(10, 2),
-    largura      numeric(10, 2),
-    altura       numeric(10, 2),
-    data_criacao timestamp default now(),
-    ativo        boolean,
-    foreign key (id_usuario) references usuario (id),
-    foreign key (id_veiculo) references veiculo (id),
-    foreign key (id_pagamento) references pagamento (id)
-);
-
 drop table if exists pedido cascade;
 
 create table pedido
@@ -208,17 +189,4 @@ create table pedido
     foreign key (id_pagamento) references pagamento (id),
     foreign key (id_endereco_origem) references endereco (id),
     foreign key (id_endereco_destino) references endereco (id)
-);
-
-
-drop table if exists pedido_carga;
-create table pedido_carga
-(
-    id_pedido    bigint,
-    id_carga     bigint,
-    data_criacao timestamp default now(),
-    ativo        boolean,
-    primary key (id_pedido, id_carga),
-    foreign key (id_pedido) references pedido (id),
-    foreign key (id_carga) references carga (id)
 );
