@@ -22,4 +22,4 @@ WORKDIR /app
 # Copy the native executable
 COPY --from=builder /app/build/native/nativeCompile/levo-pra-voce /app/levo-pra-voce
 # Run the native executable
-CMD ["/app/levo-pra-voce"]
+#CMD ["/app/levo-pra-voce"]

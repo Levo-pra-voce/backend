@@ -18,7 +18,6 @@ public class UserManagementDeciderService {
     return switch (userType) {
       case ENTREGADOR -> deliveryUserService;
       case CLIENTE -> clientUserService;
-      default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User type not found");
     };
   }
 }
