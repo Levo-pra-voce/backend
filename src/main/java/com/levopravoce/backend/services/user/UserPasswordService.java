@@ -87,7 +87,13 @@ public class UserPasswordService {
         }
 
         User user = optionalUser.get();
-        user.setPassword(passwordEncoder.encode(password));
+
+        String encodedPassword = passwordEncoder.encode(password);
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Password is the same as the current one");
+        }
+
+        user.setPassword(encodedPassword);
         userRepository.saveAndFlush(user);
         passwordRestoreCache.remove(code);
     }
