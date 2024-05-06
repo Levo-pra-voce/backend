@@ -27,13 +27,11 @@ public class ClientUserService implements UserManagement {
 
   @Override
   public JwtResponseDTO save(UserDTO userDTO) {
-
     userUtils.validateUserFields(userDTO);
 
     if (userRepository.existsByEmailOrCpf(userDTO.getEmail(), userDTO.getCpf())) {
       throw new IllegalArgumentException("Email already exists");
     }
-
     Address address = userUtils.buildAddressByUserDTO(userDTO);
 
     User user =
@@ -55,7 +53,6 @@ public class ClientUserService implements UserManagement {
 
   @Override
   public JwtResponseDTO update(UserDTO userDTO) {
-
     User user =
         userRepository
             .findByEmail(userDTO.getEmail())

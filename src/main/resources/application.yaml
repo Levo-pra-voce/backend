@@ -29,6 +29,18 @@ spring:
   flyway:
     schemas: public
     baseline-on-migrate: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+#    username: Luiz Eduardo Sagaz Carvalho
+    username: levopravoceoficial@gmail.com
+    password: crlebwntrciljate
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 jwt:
   secret: tnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7To
 

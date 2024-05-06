@@ -50,6 +50,12 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     runtimeOnly("com.h2database:h2")
     implementation("com.h2database:h2:1.3.148")
+
+    implementation("com.google.guava:guava:latest.release")
+
+    implementation("org.springframework.boot:spring-boot-starter-mail:3.1.5")
+
+    implementation("org.apache.commons:commons-lang3:3.14.0")
 }
 
 group = "com.levo-pra-voce"

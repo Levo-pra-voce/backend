@@ -59,8 +59,8 @@ public class UserUtils {
       throw new IllegalArgumentException("Password is required");
     }
 
-    if (userDTO.getPassword().length() < 6) {
-      throw new IllegalArgumentException("Password must have at least 6 characters");
+    if (passwordIsInvalid(userDTO.getPassword())) {
+      throw new IllegalArgumentException("Password is invalid");
     }
 
     if (userDTO.getPhone() == null || userDTO.getPhone().isEmpty()) {
@@ -82,5 +82,9 @@ public class UserUtils {
     if (!userDTO.getCpf().matches("[0-9]+")) {
       throw new IllegalArgumentException("CPF must have only numbers");
     }
+  }
+
+  public boolean passwordIsInvalid(String password) {
+    return password == null || !password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$");
   }
 }
