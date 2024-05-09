@@ -24,7 +24,6 @@
 
 ## Desenvolvedores
 [Luiz Eduardo](https://github.com/luiz-eduardo14)
-[Eliezer Silva](https://github.com/Eliezer-TEC)
 [Gabriel Vitorino](https://github.com/Tr00vuada)
 
 ## Modelo de desenvolvimento 
