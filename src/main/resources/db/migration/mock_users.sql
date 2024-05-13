@@ -91,14 +91,14 @@ begin
 end;
 $$ language plpgsql;
 
--- alter sequence usuario_id_seq restart with 1;
--- alter sequence grupo_id_seq restart with 1;
--- truncate table usuario_grupo;
--- truncate table grupo cascade;
--- truncate table usuario cascade;
--- vacuum full usuario;
--- vacuum full grupo;
--- vacuum full usuario_grupo;
--- call mock_usuario(10000, 0, 1, null, null);
--- select mock_grupo();
--- select mock_usuario_grupo();
+alter sequence usuario_id_seq restart with 1;
+alter sequence grupo_id_seq restart with 1;
+truncate table usuario_grupo;
+truncate table grupo cascade;
+truncate table usuario cascade;
+vacuum full usuario;
+vacuum full grupo;
+vacuum full usuario_grupo;
+call mock_usuario(10000, 0, 1, null, null);
+select mock_grupo();
+select mock_usuario_grupo();

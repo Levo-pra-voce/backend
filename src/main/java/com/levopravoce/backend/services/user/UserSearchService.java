@@ -18,31 +18,12 @@ public class UserSearchService {
   private final UserRepository userRepository;
   private final JwtTokenUtil jwtService;
 
-  public UserDTO getUser(String email) {
-
-    User user = userRepository
-        .findByEmail(email)
-        .orElseThrow(() -> new RuntimeException("User not found"));
-
+  public UserDTO getUser(User user) {
+    UserDTO userDTO = user.toDTO();
     String jwt = jwtService.generateToken(user);
+    userDTO.setToken(jwt);
 
-    return UserDTO.builder()
-        .email(user.getEmail())
-        .name(user.getName())
-        .cpf(user.getCpf())
-        .cnh(user.getCnh())
-        .vehicle(Optional.ofNullable(user.getVehicles())
-            .orElse(List.of())
-            .stream().findFirst()
-            .orElse(null))
-        .status(user.getStatus().name())
-        .userType(user.getUserType())
-        .street(Optional.ofNullable(user.getAddresses())
-            .orElse(List.of())
-            .stream().findFirst()
-            .map(Address::getStreet).orElse(null))
-        .token(jwt)
-        .build();
+    return userDTO;
   }
 
   public List<UserDTO> getUserList() {

@@ -19,14 +19,14 @@ public class UserUtils {
 
   public Address buildAddressByUserDTO(UserDTO userDTO) {
     if (userDTO.getZipCode() == null) {
-      throw new IllegalArgumentException("Zip code is required");
+      throw new IllegalArgumentException("CEP é obrigatório");
     }
 
     var viaCepResponse = restTemplate.getForObject(VIA_CEP_URL + userDTO.getZipCode() + "/json",
         ViaCepResponseDTO.class);
 
     if (viaCepResponse == null) {
-      throw new IllegalArgumentException("Zip code not found");
+      throw new IllegalArgumentException("CEP inválido");
     }
 
     return Address.builder()
@@ -43,44 +43,60 @@ public class UserUtils {
   }
 
   public void validateUserFields(UserDTO userDTO) {
-    if (userDTO.getName() == null || userDTO.getName().isEmpty()) {
-      throw new IllegalArgumentException("Name is required");
+    validateName(userDTO.getName());
+    validateEmail(userDTO.getEmail());
+    validatePassword(userDTO.getPassword());
+    validatePhone(userDTO.getPhone());
+    validateCpf(userDTO.getCpf());
+  }
+
+  public void validateName(String name) {
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("Nome é obrigatório");
+    }
+  }
+
+  public void validateEmail(String email) {
+    if (email == null || email.isEmpty()) {
+      throw new IllegalArgumentException("Email é obrigatório");
     }
 
-    if (userDTO.getEmail() == null || userDTO.getEmail().isEmpty()) {
-      throw new IllegalArgumentException("Email is required");
+    if (!email.matches(EMAIL_REGEX)) {
+      throw new IllegalArgumentException("Email inválido");
+    }
+  }
+
+  public void validatePassword(String password) {
+    if (password == null || password.isEmpty()) {
+      throw new IllegalArgumentException("Senha é obrigatória");
     }
 
-    if (!userDTO.getEmail().matches(EMAIL_REGEX)) {
-      throw new IllegalArgumentException("Email is invalid");
+    if (passwordIsInvalid(password)) {
+      throw new IllegalArgumentException("Senha deve conter ao menos 6 caracteres, uma letra maiúscula, uma letra minúscula e um número");
+    }
+  }
+
+  public void validatePhone(String phone) {
+    if (phone == null || phone.isEmpty()) {
+      throw new IllegalArgumentException("Telefone é obrigatório");
     }
 
-    if (userDTO.getPassword() == null || userDTO.getPassword().isEmpty()) {
-      throw new IllegalArgumentException("Password is required");
+    if (phone.contains(" ")) {
+      throw new IllegalArgumentException("Telefone não pode conter espaços");
+    }
+  }
+
+  public void validateCpf(String cpf) {
+    if (cpf == null || cpf.isEmpty()) {
+      throw new IllegalArgumentException("CPF é obrigatório");
     }
 
-    if (passwordIsInvalid(userDTO.getPassword())) {
-      throw new IllegalArgumentException("Password is invalid");
+    if (cpf.length() != 11) {
+      throw new IllegalArgumentException("CPF deve conter 11 dígitos");
     }
 
-    if (userDTO.getPhone() == null || userDTO.getPhone().isEmpty()) {
-      throw new IllegalArgumentException("Phone is required");
-    }
-
-    if (userDTO.getPhone().contains(" ")) {
-      throw new IllegalArgumentException("Phone must not contain spaces");
-    }
-
-    if (userDTO.getCpf() == null || userDTO.getCpf().isEmpty()) {
-      throw new IllegalArgumentException("CPF is required");
-    }
-
-    if (userDTO.getCpf().length() != 11) {
-      throw new IllegalArgumentException("CPF must have 11 digits");
-    }
-
-    if (!userDTO.getCpf().matches("[0-9]+")) {
-      throw new IllegalArgumentException("CPF must have only numbers");
+    if (!cpf.matches("[0-9]+")) {
+      throw new IllegalArgumentException("CPF deve conter apenas números");
     }
   }
 

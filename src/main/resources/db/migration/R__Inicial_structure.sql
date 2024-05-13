@@ -5,13 +5,15 @@ create table usuario (
                          email         text unique,
                          senha         text,
                          cpf           text,
-                         cnh text,
-                         nome text,
+                         cnh           text,
+
+                         nome          text,
                          contato       text,
                          tipo          text,
                          data_criacao  timestamp default now(),
                          ativo         boolean,
-                         status        text
+                         status        text,
+                         foto          bytea
 );
 
 drop table if exists endereco cascade;
@@ -29,45 +31,6 @@ create table endereco (
                           data_criacao timestamp default now(),
                           ativo        boolean,
                           foreign key (id_usuario) references usuario (id)
-);
-
-drop table if exists grupo cascade;
-
-create table grupo (
-                       id           bigserial primary key,
-                       nome         text,
-                       data_criacao timestamp default now(),
-                       ativo        boolean
-);
-
-drop table if exists usuario_grupo;
-
-create table usuario_grupo (
-                               id_usuario   bigint,
-                               id_grupo     bigint,
-                               data_criacao timestamp default now(),
-                               ativo        boolean,
-                               primary key (id_usuario, id_grupo),
-                               foreign key (id_usuario) references usuario (id),
-                               foreign key (id_grupo) references grupo (id)
-);
-
-drop index if exists idx_usuario_grupo_id_grupo;
-create index idx_usuario_grupo_id_usuario on usuario_grupo (id_usuario);
-
-drop table if exists mensagem;
-
-create table mensagem (
-                          id                   bigserial primary key,
-                          id_usuario           bigint not null,
-                          id_grupo             bigint not null,
-                          id_mensagem_resposta bigint,
-                          mensagem             bytea  not null,
-                          tipo_mensagem        text,
-                          data_criacao         timestamp default now(),
-                          ativo                boolean,
-                          foreign key (id_usuario) references usuario (id),
-                          foreign key (id_grupo) references grupo (id)
 );
 
 drop table if exists permissao cascade;
@@ -159,16 +122,16 @@ drop table if exists pagamento cascade;
 
 create table pagamento (
                            id           bigserial primary key,
-                           id_usuario   bigint,
+                           id_usuario_pagador   bigint,
+                           id_usuario_recebedor bigint,
                            id_veiculo   bigint,
-                           id_grupo     bigint,
                            valor        numeric(10, 2),
                            data_criacao timestamp default now(),
                            ativo        boolean,
                            status       text,
-                           foreign key (id_usuario) references usuario (id),
+                           foreign key (id_usuario_pagador) references usuario (id),
                            foreign key (id_veiculo) references veiculo (id),
-                           foreign key (id_grupo) references grupo (id)
+                           foreign key (id_usuario_recebedor) references usuario (id)
 );
 
 drop table if exists pedido cascade;

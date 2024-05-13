@@ -33,12 +33,12 @@ public class UserPasswordService {
 
     public void restorePassword(String email) throws MessagingException {
         if (email == null) {
-            throw new IllegalArgumentException("Email is required");
+            throw new IllegalArgumentException("Email é obrigatório");
         }
 
-        boolean userExist = userRepository.existsByEmailOrCpf(email, null);
+        boolean userExist = userRepository.existsByEmail(email);
         if (!userExist) {
-            throw new IllegalArgumentException("User not found");
+            throw new IllegalArgumentException("Usuário não encontrado");
         }
 
         String randomCode = RandomStringUtils.randomAlphabetic(8);

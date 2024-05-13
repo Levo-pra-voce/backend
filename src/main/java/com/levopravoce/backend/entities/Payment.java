@@ -28,14 +28,14 @@ public class Payment {
     private boolean active = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario")
-    private User user;
+    @JoinColumn(name = "id_usuario_recebedor")
+    private User userReceiver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_pagador")
+    private User userPayer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_veiculo")
     private Vehicle vehicle;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_grupo")
-    private Group group;
 }

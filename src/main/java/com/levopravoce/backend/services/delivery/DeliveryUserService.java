@@ -32,11 +32,15 @@ public class DeliveryUserService implements UserManagement {
     userUtils.validateUserFields(userDTO);
 
     if (userDTO.getVehicle() == null) {
-      throw new IllegalArgumentException("Vehicle is required");
+      throw new IllegalArgumentException("Veiculo não informado");
     }
 
-    if (userRepository.existsByEmailOrCpf(userDTO.getEmail(), userDTO.getCpf())) {
-      throw new IllegalArgumentException("Email already exists");
+    if (userRepository.existsByEmail(userDTO.getEmail())) {
+      throw new IllegalArgumentException("Email já foi cadastrado");
+    }
+
+    if (userRepository.existsByCpf(userDTO.getCpf())) {
+      throw new IllegalArgumentException("CPF já foi cadastrado");
     }
 
     User user =
@@ -44,7 +48,7 @@ public class DeliveryUserService implements UserManagement {
             .name(userDTO.getName())
             .email(userDTO.getEmail())
             .password(passwordEncoder.encode(userDTO.getPassword()))
-            .contact(userDTO.getContact())
+            .contact(userDTO.getPhone())
             .status(Status.ACTIVE)
             .userType(UserType.ENTREGADOR)
             .addresses(List.of(userUtils.buildAddressByUserDTO(userDTO)))
@@ -57,21 +61,16 @@ public class DeliveryUserService implements UserManagement {
   }
 
   @Override
-  public JwtResponseDTO update(UserDTO userDTO) {
-    userUtils.validateUserFields(userDTO);
+  public UserDTO update(User user,UserDTO updatedUser) {
+    userUtils.validateName(updatedUser.getName());
+    userUtils.validatePhone(updatedUser.getPhone());
 
-    User user =
-        userRepository
-            .findByEmail(userDTO.getEmail())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    user.setName(updatedUser.getName());
+    user.setContact(updatedUser.getPhone());
 
-    user.setName(userDTO.getName());
-    user.setContact(userDTO.getContact());
+    var savedUser = userRepository.save(user);
 
-    userRepository.save(user);
-
-    String jwt = jwtService.generateToken(user);
-    return JwtResponseDTO.builder().token(jwt).userType(UserType.ENTREGADOR).build();
+    return savedUser.toDTO();
   }
 
   @Override

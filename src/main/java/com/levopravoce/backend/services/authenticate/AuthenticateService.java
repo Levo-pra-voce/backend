@@ -38,14 +38,4 @@ public class AuthenticateService {
     UserManagement userManagement = userManagementDeciderService.getServiceByType(userType);
     return userManagement.save(dto);
   }
-
-  public JwtResponseDTO update(UserType userType, UserDTO dto) {
-    UserManagement userManagement = userManagementDeciderService.getServiceByType(userType);
-    return userManagement.update(dto);
-  }
-
-  public void delete(UserType userType, UserDTO dto) {
-    UserManagement userManagement = userManagementDeciderService.getServiceByType(userType);
-    userManagement.delete(dto);
-  }
 }

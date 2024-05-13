@@ -1,6 +1,7 @@
 package com.levopravoce.backend.common;
 
 import com.levopravoce.backend.entities.User;
+import com.levopravoce.backend.entities.UserType;
 import java.util.Optional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,28 @@ public class SecurityUtils {
           SecurityContextHolder.getContext().getAuthentication());
       if (authentication.isPresent()) {
         return ((User) authentication.get().getPrincipal()).getEmail();
+      }
+    }
+    throw new RuntimeException("User not found");
+  }
+
+  public static String getCurrentUserEmail() {
+    if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
+      Optional<Authentication> authentication = Optional.ofNullable(
+          SecurityContextHolder.getContext().getAuthentication());
+      if (authentication.isPresent()) {
+        return ((User) authentication.get().getPrincipal()).getEmail();
+      }
+    }
+    throw new RuntimeException("User not found");
+  }
+
+  public static UserType getCurrentUserType() {
+    if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
+      Optional<Authentication> authentication = Optional.ofNullable(
+          SecurityContextHolder.getContext().getAuthentication());
+      if (authentication.isPresent()) {
+        return ((User) authentication.get().getPrincipal()).getUserType();
       }
     }
     throw new RuntimeException("User not found");

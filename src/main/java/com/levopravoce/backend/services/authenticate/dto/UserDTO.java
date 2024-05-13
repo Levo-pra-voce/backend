@@ -18,7 +18,6 @@ public class UserDTO {
   private String cpf;
   private String cnh;
   private String city;
-  private String contact;
   private String state;
   private String zipCode;
   private String country;
@@ -30,6 +29,7 @@ public class UserDTO {
   private Vehicle vehicle;
   private String token;
   private String addressNumber;
+  private byte[] profilePicture;
 
   public User toEntity() {
     return User.builder()
@@ -39,7 +39,7 @@ public class UserDTO {
         .password(password)
         .cpf(cpf)
         .cnh(cnh)
-        .contact(contact)
+        .contact(phone)
         .build();
   }
 }

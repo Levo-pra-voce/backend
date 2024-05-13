@@ -1,7 +1,9 @@
 package com.levopravoce.backend.resources.user;
 
 import com.levopravoce.backend.common.SecurityUtils;
+import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
+import com.levopravoce.backend.services.user.UserManagementDeciderService;
 import com.levopravoce.backend.services.user.UserPasswordService;
 import com.levopravoce.backend.services.user.UserSearchService;
 
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,10 +29,16 @@ public class UserResource {
 
     private final UserSearchService userSearchService;
     private final UserPasswordService userPasswordService;
+    private final UserManagementDeciderService userManagementDeciderService;
 
     @GetMapping("/me")
     public UserDTO getUser() {
-        return userSearchService.getUser(SecurityUtils.getCurrentUsername());
+        return userSearchService.getUser(SecurityUtils
+            .getCurrentUser()
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+            )
+        );
     }
 
     @GetMapping("/all")
@@ -55,5 +64,12 @@ public class UserResource {
     @PutMapping("/change-password")
     public void changePassword(String code, String password) {
         userPasswordService.changePassword(code, password);
+    }
+
+    @PutMapping
+    public void update(@RequestBody UserDTO userDTO) {
+        var currentUser = SecurityUtils.getCurrentUser().orElseThrow();
+        var userService = userManagementDeciderService.getServiceByType(currentUser.getUserType());
+        userService.update(currentUser, userDTO);
     }
 }

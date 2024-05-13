@@ -59,7 +59,7 @@ public class User implements UserDetails {
     @Column(name = "contato")
     private String contact;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_usuario")
     private List<Address> addresses;
 
@@ -71,15 +71,7 @@ public class User implements UserDetails {
     )
     private List<Profile> profiles;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "usuario_grupo",
-            joinColumns = @JoinColumn(name = "id_usuario"),
-            inverseJoinColumns = @JoinColumn(name = "id_grupo")
-    )
-    private List<Group> groups;
-
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_usuario")
     private List<Vehicle> vehicles;
 
@@ -89,6 +81,9 @@ public class User implements UserDetails {
 
     @Transient
     private Date expirationDate;
+
+    @Column(name = "foto")
+    private byte[] profilePicture;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -139,12 +134,26 @@ public class User implements UserDetails {
     }
 
     public UserDTO toDTO() {
-        return UserDTO.builder()
-            .id(this.id)
-                .email(this.email)
-            .name(this.name)
-                .cpf(this.cpf)
-                .contact(this.contact)
-                .build();
+    Address address = this.getAddresses().stream().findFirst().orElse(null);
+
+    return UserDTO.builder()
+        .id(this.getId())
+        .email(this.getEmail())
+        .name(this.getName())
+        .zipCode(Optional.ofNullable(address).map(Address::getZipCode).orElse(null))
+        .city(Optional.ofNullable(address).map(Address::getCity).orElse(null))
+        .complement(Optional.ofNullable(address).map(Address::getComplement).orElse(null))
+        .phone(this.getContact())
+        .vehicle(Optional.ofNullable(this.getVehicles())
+            .orElse(List.of())
+            .stream().findFirst()
+            .orElse(null))
+        .status(this.getStatus().name())
+        .userType(this.getUserType())
+        .street(Optional.ofNullable(this.getAddresses())
+            .orElse(List.of())
+            .stream().findFirst()
+            .map(Address::getStreet).orElse(null))
+        .build();
     }
 }
