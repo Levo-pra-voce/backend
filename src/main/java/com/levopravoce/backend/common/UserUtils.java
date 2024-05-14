@@ -72,7 +72,7 @@ public class UserUtils {
     }
 
     if (passwordIsInvalid(password)) {
-      throw new IllegalArgumentException("Senha deve conter ao menos 6 caracteres, uma letra maiúscula, uma letra minúscula e um número");
+      throw new IllegalArgumentException("Senha deve conter ao menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um número");
     }
   }
 
@@ -101,6 +101,6 @@ public class UserUtils {
   }
 
   public boolean passwordIsInvalid(String password) {
-    return password == null || !password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$");
+    return password == null || !password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$");
   }
 }

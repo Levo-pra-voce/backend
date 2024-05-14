@@ -1,6 +1,5 @@
 package com.levopravoce.backend.services.client;
 
-import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.common.UserUtils;
 import com.levopravoce.backend.entities.Address;
 import com.levopravoce.backend.entities.Status;
@@ -22,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class ClientUserService implements UserManagement {
+
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenUtil jwtService;
@@ -43,6 +43,7 @@ public class ClientUserService implements UserManagement {
 
     User user =
         User.builder()
+            .cpf(userDTO.getCpf())
             .name(userDTO.getName())
             .email(userDTO.getEmail())
             .password(passwordEncoder.encode(userDTO.getPassword()))
@@ -59,7 +60,7 @@ public class ClientUserService implements UserManagement {
   }
 
   @Override
-  public UserDTO update(User currentUser, UserDTO updatedUser) {
+  public void update(User currentUser, UserDTO updatedUser) {
     if (!Objects.isNull(updatedUser.getName())) {
       userUtils.validateName(updatedUser.getName());
       currentUser.setName(updatedUser.getName());
@@ -70,29 +71,27 @@ public class ClientUserService implements UserManagement {
       currentUser.setContact(updatedUser.getPhone());
     }
 
-    Address lastAddress = currentUser.getAddresses().stream().findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado"));
+    Address lastAddress = currentUser.getAddresses().stream().findFirst().orElseThrow(
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado"));
 
     if (!Objects.equals(updatedUser.getComplement(), lastAddress.getComplement())) {
-      boolean complementIsEmpty = updatedUser.getComplement() == null || updatedUser.getComplement().isEmpty();
+      boolean complementIsEmpty =
+          updatedUser.getComplement() == null || updatedUser.getComplement().isEmpty();
       lastAddress.setComplement(complementIsEmpty ? null : updatedUser.getComplement());
     }
 
-    if (updatedUser.getZipCode() != null && !Objects.equals(updatedUser.getZipCode(), lastAddress.getZipCode())) {
+    if (updatedUser.getZipCode() != null && !Objects.equals(updatedUser.getZipCode(),
+        lastAddress.getZipCode())) {
       Address address = userUtils.buildAddressByUserDTO(updatedUser);
       currentUser.setAddresses(List.of(address));
     }
 
     var savedUser = userRepository.save(currentUser);
-    return savedUser.toDTO();
+    savedUser.toDTO();
   }
 
   @Override
-  public void delete(UserDTO userDTO) {
-    User user =
-        userRepository
-            .findByEmail(userDTO.getEmail())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
-
+  public void delete(User user) {
     user.setStatus(Status.INACTIVE);
 
     userRepository.save(user);

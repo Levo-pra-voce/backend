@@ -5,9 +5,10 @@ import com.levopravoce.backend.services.authenticate.dto.JwtResponseDTO;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 
 public interface UserManagement {
+
   JwtResponseDTO save(UserDTO userDTO);
 
-  UserDTO update(User currentUser, UserDTO updatedUser);
+  void update(User currentUser, UserDTO updatedUser);
 
-  void delete(UserDTO userDTO);
+  void delete(User currentUser);
 }

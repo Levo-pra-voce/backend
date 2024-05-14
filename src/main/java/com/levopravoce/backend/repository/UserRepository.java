@@ -14,14 +14,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByEmail(String email);
 
   @Query(
-      """
-              SELECT u.name
-            FROM User u
-                WHERE u.email = :email and u.status = com.levopravoce.backend.entities.Status.ACTIVE
-    """)
-  Optional<String> getNameByEmail(String email);
-
+      value = """
+              SELECT EXISTS(SELECT 1 FROM usuario u WHERE u.email = :email)
+    """, nativeQuery = true)
   boolean existsByEmail(String email);
 
+  @Query(
+      value = """
+              SELECT EXISTS(SELECT 1 FROM usuario u WHERE u.email = :cpf)
+    """, nativeQuery = true)
   boolean existsByCpf(String cpf);
 }

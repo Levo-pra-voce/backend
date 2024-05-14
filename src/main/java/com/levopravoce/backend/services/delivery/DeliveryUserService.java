@@ -11,16 +11,14 @@ import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
 public class DeliveryUserService implements UserManagement {
+
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenUtil jwtService;
@@ -45,6 +43,8 @@ public class DeliveryUserService implements UserManagement {
 
     User user =
         User.builder()
+            .cpf(userDTO.getCpf())
+            .cnh(userDTO.getCnh())
             .name(userDTO.getName())
             .email(userDTO.getEmail())
             .password(passwordEncoder.encode(userDTO.getPassword()))
@@ -61,7 +61,7 @@ public class DeliveryUserService implements UserManagement {
   }
 
   @Override
-  public UserDTO update(User user,UserDTO updatedUser) {
+  public void update(User user, UserDTO updatedUser) {
     userUtils.validateName(updatedUser.getName());
     userUtils.validatePhone(updatedUser.getPhone());
 
@@ -70,16 +70,11 @@ public class DeliveryUserService implements UserManagement {
 
     var savedUser = userRepository.save(user);
 
-    return savedUser.toDTO();
+    savedUser.toDTO();
   }
 
   @Override
-  public void delete(UserDTO userDTO) {
-    User user =
-        userRepository
-            .findByEmail(userDTO.getEmail())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
+  public void delete(User user) {
     user.setStatus(Status.INACTIVE);
 
     userRepository.save(user);
