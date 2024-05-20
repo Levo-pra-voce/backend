@@ -1,7 +1,9 @@
 services:
 
   api:
-    build: .
+    build:
+        context: .
+        dockerfile: Dockerfile-jvm
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-levo-pra-voce:5432/postgres
       - SPRING_DATASOURCE_JDBCURL=jdbc:postgresql://postgres-levo-pra-voce:5432/postgres
