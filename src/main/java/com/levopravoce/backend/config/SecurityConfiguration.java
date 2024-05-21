@@ -35,9 +35,9 @@ public class SecurityConfiguration {
   private final String[] AUTH_WHITELIST = {
       "/api/auth/**",
       "/error",
-      "/api/user/restore-password/*",
-      "/api/user/exist-code/*",
-      "/api/user/change-password",
+      "/api/user/forgot-password/exist-code",
+      "/api/user/forgot-password/change-password",
+      "/api/user/forgot-password/**",
   };
 
   @Bean

@@ -64,11 +64,11 @@ public class UserResource {
     userPasswordService.restorePassword(email);
   }
 
-  @GetMapping("/forgot-password/exist-code/{email}/{code}")
-  public ResponseEntity<Void> existCode(@PathVariable String email, @PathVariable String code) {
-    boolean existCode = userPasswordService.existCode(email, code);
+  @PostMapping("/forgot-password/exist-code")
+  public ResponseEntity<Void> existCode(@RequestBody PasswordCodeDTO passwordCodeDTO) {
+    boolean existCode = userPasswordService.existCode(passwordCodeDTO.getEmail(), passwordCodeDTO.getCode());
     if (!existCode) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Code not found");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Código não encontrado");
     }
 
     return ResponseEntity.ok().build();

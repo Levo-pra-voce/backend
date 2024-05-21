@@ -42,7 +42,7 @@ public class UserPasswordService {
             throw new IllegalArgumentException("Usuário não encontrado");
         }
 
-        String randomCode = email + RandomStringUtils.randomAlphabetic(8);
+        String randomCode = RandomStringUtils.randomAlphabetic(8);
         MimeMessage mailSenderMimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mailMessage = new MimeMessageHelper(mailSenderMimeMessage, false, StandardCharsets.UTF_8.name());
         mailMessage.setFrom(mailFrom);
@@ -57,7 +57,7 @@ public class UserPasswordService {
         PasswordRestore passwordRestore = new PasswordRestore();
         passwordRestore.setEmail(email);
         passwordRestore.setRestoreTime(LocalDateTime.now());
-        passwordRestoreCache.add(randomCode, passwordRestore);
+        passwordRestoreCache.add(email + randomCode, passwordRestore);
     }
 
     public boolean existCode(String email, String code) {
