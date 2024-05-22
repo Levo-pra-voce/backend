@@ -139,17 +139,19 @@ drop table if exists pedido cascade;
 create table pedido
 (
     id                  bigserial primary key,
-    id_usuario          bigint,
+    id_entregador       bigint,
+    id_cliente          bigint NOT NULL,
     id_veiculo          bigint,
     id_pagamento        bigint,
-    id_endereco_origem  bigint,
-    id_endereco_destino bigint,
-    data_criacao        timestamp default now(),
-    ativo               boolean,
+    data_entrega        timestamp default now(),
+    altura              DOUBLE PRECISION NOT NULL ,
+    largura             DOUBLE PRECISION NOT NULL ,
+    peso_maximo         DOUBLE PRECISION NOT NULL,
+    seguro              boolean default false,
+    valor               DOUBLE PRECISION,
     status              text,
-    foreign key (id_usuario) references usuario (id),
+    foreign key (id_entregador) references usuario (id),
+    foreign key (id_cliente) references usuario (id),
     foreign key (id_veiculo) references veiculo (id),
-    foreign key (id_pagamento) references pagamento (id),
-    foreign key (id_endereco_origem) references endereco (id),
-    foreign key (id_endereco_destino) references endereco (id)
+    foreign key (id_pagamento) references pagamento (id)
 );

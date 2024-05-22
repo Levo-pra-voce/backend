@@ -56,6 +56,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail:3.1.5")
 
     implementation("org.apache.commons:commons-lang3:3.14.0")
+
+    implementation("org.mapstruct:mapstruct:1.5.5.Final")
 }
 
 group = "com.levo-pra-voce"
