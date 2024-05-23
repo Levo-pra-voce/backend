@@ -5,6 +5,7 @@ import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagementDeciderService;
 import com.levopravoce.backend.services.user.UserPasswordService;
 import com.levopravoce.backend.services.user.UserSearchService;
+import com.levopravoce.backend.services.user.dto.PasswordCodeDTO;
 import jakarta.mail.MessagingException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -44,26 +45,6 @@ public class UserResource {
     return userSearchService.getUserList();
   }
 
-  @PostMapping("/restore-password/{email}")
-  public void restorePassword(@PathVariable String email) throws MessagingException {
-    userPasswordService.restorePassword(email);
-  }
-
-  @GetMapping("/exist-code/{code}")
-  public ResponseEntity<Void> existCode(@PathVariable String code) {
-    boolean existCode = userPasswordService.existCode(code);
-    if (!existCode) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Code not found");
-    }
-
-    return ResponseEntity.ok().build();
-  }
-
-  @PutMapping("/change-password")
-  public void changePassword(String code, String password) {
-    userPasswordService.changePassword(code, password);
-  }
-
   @PutMapping
   public void update(@RequestBody UserDTO userDTO) {
     var currentUser = SecurityUtils.getCurrentUser().orElseThrow();
@@ -76,5 +57,25 @@ public class UserResource {
     var currentUser = SecurityUtils.getCurrentUser().orElseThrow();
     var userService = userManagementDeciderService.getServiceByType(currentUser.getUserType());
     userService.delete(currentUser);
+  }
+
+  @PostMapping("/forgot-password/{email}")
+  public void restorePassword(@PathVariable String email) throws MessagingException {
+    userPasswordService.restorePassword(email);
+  }
+
+  @PostMapping("/forgot-password/exist-code")
+  public ResponseEntity<Void> existCode(@RequestBody PasswordCodeDTO passwordCodeDTO) {
+    boolean existCode = userPasswordService.existCode(passwordCodeDTO.getEmail(), passwordCodeDTO.getCode());
+    if (!existCode) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Código não encontrado");
+    }
+
+    return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/forgot-password/change-password")
+  public void changePassword(@RequestBody PasswordCodeDTO passwordCodeDTO) {
+    userPasswordService.changePassword(passwordCodeDTO);
   }
 }

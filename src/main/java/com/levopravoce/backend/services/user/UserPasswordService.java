@@ -4,6 +4,7 @@ import com.levopravoce.backend.common.UserUtils;
 import com.levopravoce.backend.common.cache.CacheStore;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.repository.UserRepository;
+import com.levopravoce.backend.services.user.dto.PasswordCodeDTO;
 import com.levopravoce.backend.services.user.dto.PasswordRestore;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -56,41 +57,44 @@ public class UserPasswordService {
         PasswordRestore passwordRestore = new PasswordRestore();
         passwordRestore.setEmail(email);
         passwordRestore.setRestoreTime(LocalDateTime.now());
-        passwordRestoreCache.add(randomCode, passwordRestore);
+        passwordRestoreCache.add(email + randomCode, passwordRestore);
     }
 
-    public boolean existCode(String code) {
-        return passwordRestoreCache.exist(code);
+    public boolean existCode(String email, String code) {
+        return passwordRestoreCache.exist(email + code);
     }
 
-    public void changePassword(String code, String password) {
+    public void changePassword(PasswordCodeDTO passwordCodeDTO) {
+        String email = passwordCodeDTO.getEmail();
+        String code = passwordCodeDTO.getCode();
+        String password = passwordCodeDTO.getPassword();
         if (code == null || password == null) {
-            throw new IllegalArgumentException("Code and password are required");
+            throw new IllegalArgumentException("Código e senha são obrigatórios");
         }
 
-        PasswordRestore passwordRestore = passwordRestoreCache.get(code);
+        PasswordRestore passwordRestore = passwordRestoreCache.get(email + code);
         if (passwordRestore == null) {
-            throw new IllegalArgumentException("Code not found");
+            throw new IllegalArgumentException("Código inválido");
         }
 
         if (passwordRestore.getRestoreTime().plusHours(1).isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Code expired");
+            throw new IllegalArgumentException("Código expirado");
         }
 
         if (userUtils.passwordIsInvalid(password)) {
-            throw new IllegalArgumentException("Password is invalid");
+            throw new IllegalArgumentException("Senha inválida");
         }
 
         Optional<User> optionalUser = userRepository.findByEmail(passwordRestore.getEmail());
         if (optionalUser.isEmpty()) {
-            throw new IllegalArgumentException("User not found");
+            throw new IllegalArgumentException("Usuário não encontrado");
         }
 
         User user = optionalUser.get();
 
         String encodedPassword = passwordEncoder.encode(password);
         if (passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("Password is the same as the current one");
+            throw new IllegalArgumentException("A nova senha não pode ser igual à antiga");
         }
 
         user.setPassword(encodedPassword);
