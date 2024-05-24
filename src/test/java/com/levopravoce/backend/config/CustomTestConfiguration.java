@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -13,6 +14,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @TestConfiguration
 public class CustomTestConfiguration {
 
+  @Primary
   @Bean
   public UserDetailsService userDetailsService() {
     return new InMemoryUserDetailsManager(List.of(UserMock.DELIVERY_USER, UserMock.CLIENT_USER));
