@@ -21,7 +21,7 @@ public class OrderService {
     private final OrderUtils orderUtils;
 
     public OrderDTO createOrder(OrderDTO orderDTO) {
-        orderUtils.validateFields(orderDTO);
+        orderUtils.validateNewOrder(orderDTO);
 
         User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
 
