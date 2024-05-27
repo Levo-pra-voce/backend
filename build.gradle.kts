@@ -73,6 +73,8 @@ dependencies {
 
     // Extras
     implementation("javax.xml.bind:jaxb-api:2.3.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.17.1")
+    implementation("javax.persistence:javax.persistence-api:2.2")
 }
 
 group = "com.levo-pra-voce"
