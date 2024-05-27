@@ -7,6 +7,7 @@ import com.levopravoce.backend.repository.OrderRepository;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.TimeZone;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,12 @@ import org.springframework.stereotype.Service;
 public class RelatoryService {
   private final OrderRepository orderRepository;
 
-  public ByteArrayResource getRelatory() throws IOException {
+  public ByteArrayResource getRelatory(LocalDate deliveryDate) throws IOException {
     User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
-    List<Order> orders = orderRepository.findAllByDeliveryMan(currentUser.getId());
+    List<Order> orders =
+        deliveryDate == null ? orderRepository.findAllByDeliveryMan(currentUser.getId())
+            : orderRepository.findAllByDeliveryManAndDeliveryDate(currentUser.getId(),
+                deliveryDate);
 
     try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
       Sheet sheet = workbook.createSheet("Orders");
