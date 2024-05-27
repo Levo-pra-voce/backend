@@ -21,7 +21,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @Query(
       value = """
-              SELECT EXISTS(SELECT 1 FROM usuario u WHERE u.email = :cpf)
+              SELECT EXISTS(SELECT 1 FROM usuario u WHERE u.cpf = :cpf)
     """, nativeQuery = true)
   boolean existsByCpf(String cpf);
+
+  @Query(
+      value = """
+              SELECT EXISTS(SELECT 1 FROM usuario u WHERE u.cnh = :cnh)
+    """, nativeQuery = true)
+  boolean existsByCnh(String cnh);
 }
