@@ -1,7 +1,7 @@
 package com.levopravoce.backend.resources.relatory;
 
-import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.services.relatory.RelatoryService;
+import com.levopravoce.backend.services.relatory.dto.RelatoryDTO;
 import java.io.IOException;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class RelatoryResource {
   private final RelatoryService relatoryService;
 
   @GetMapping
-  public Page<Order> getOrdersByDeliveryMan(
+  public Page<RelatoryDTO> getOrdersByDeliveryMan(
       LocalDate deliveryDate,
       @PageableDefault Pageable pageable
   ) {

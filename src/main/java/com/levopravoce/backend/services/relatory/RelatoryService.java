@@ -4,10 +4,12 @@ import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.repository.OrderRepository;
+import com.levopravoce.backend.services.relatory.dto.RelatoryDTO;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.TimeZone;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +28,14 @@ public class RelatoryService {
 
   private final OrderRepository orderRepository;
 
-  public Page<Order> getOrdersByDeliveryMan(LocalDate deliveryDate, Pageable pageable) {
+  public Page<RelatoryDTO> getOrdersByDeliveryMan(LocalDate deliveryDate, Pageable pageable) {
     User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
-
-    return deliveryDate == null ? orderRepository.findAllByDeliveryMan(currentUser.getId(),
+    Page<Order> relatoryDTOPage =
+        deliveryDate == null ? orderRepository.findAllByDeliveryMan(currentUser.getId(),
         pageable)
         : orderRepository.findAllByDeliveryManAndDeliveryDate(currentUser.getId(), deliveryDate,
             pageable);
+    return relatoryDTOPage.map(this::createRelatoryDTO);
   }
 
   public ByteArrayResource getRelatoryXlsx(LocalDate deliveryDate) throws IOException {
@@ -67,5 +70,13 @@ public class RelatoryService {
       workbook.write(byteArrayOutputStream);
       return new ByteArrayResource(byteArrayOutputStream.toByteArray());
     }
+  }
+
+  private RelatoryDTO createRelatoryDTO(Order order) {
+    return RelatoryDTO.builder()
+        .clientName(order.getClient().getName())
+        .value(order.getValue())
+        .deliveryDate(order.getDeliveryDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+        .build();
   }
 }
