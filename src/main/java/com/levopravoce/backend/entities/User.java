@@ -71,7 +71,7 @@ public class User implements UserDetails {
     )
     private List<Profile> profiles;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_usuario")
     private List<Vehicle> vehicles;
 
