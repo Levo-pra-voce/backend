@@ -16,14 +16,26 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class RelatoryService {
+
   private final OrderRepository orderRepository;
 
-  public ByteArrayResource getRelatory(LocalDate deliveryDate) throws IOException {
+  public Page<Order> getOrdersByDeliveryMan(LocalDate deliveryDate, Pageable pageable) {
+    User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
+
+    return deliveryDate == null ? orderRepository.findAllByDeliveryMan(currentUser.getId(),
+        pageable)
+        : orderRepository.findAllByDeliveryManAndDeliveryDate(currentUser.getId(), deliveryDate,
+            pageable);
+  }
+
+  public ByteArrayResource getRelatoryXlsx(LocalDate deliveryDate) throws IOException {
     User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
     List<Order> orders =
         deliveryDate == null ? orderRepository.findAllByDeliveryMan(currentUser.getId())
