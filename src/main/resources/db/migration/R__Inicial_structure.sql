@@ -101,6 +101,9 @@ create table veiculo (
                          data_criacao    timestamp default now(),
                          ativo           boolean,
                          cnh             text,
+                         altura          DOUBLE PRECISION,
+                         largura         DOUBLE PRECISION,
+                         peso_maximo     DOUBLE PRECISION,
                          foreign key (id_usuario) references usuario (id),
                          foreign key (id_tipo_veiculo) references tipo_veiculo (id)
 );
