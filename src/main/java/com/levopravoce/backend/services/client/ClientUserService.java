@@ -29,7 +29,7 @@ public class ClientUserService implements UserManagement {
 
   @Override
   public JwtResponseDTO save(UserDTO userDTO) {
-    userUtils.validateUserFields(userDTO);
+    userUtils.validateCommonUserFields(userDTO);
 
     if (userRepository.existsByEmail(userDTO.getEmail())) {
       throw new IllegalArgumentException("Email já foi cadastrado");
