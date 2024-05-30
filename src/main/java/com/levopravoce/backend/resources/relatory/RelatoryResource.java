@@ -25,7 +25,7 @@ public class RelatoryResource {
   @GetMapping
   public Page<RelatoryDTO> getOrdersByDeliveryMan(
       LocalDate deliveryDate,
-      @PageableDefault Pageable pageable
+      @PageableDefault(size = 50) Pageable pageable
   ) {
     return relatoryService.getOrdersByDeliveryMan(deliveryDate, pageable);
   }

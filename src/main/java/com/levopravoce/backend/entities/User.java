@@ -54,8 +54,7 @@ public class User implements UserDetails {
     private Boolean active = false;
 
     @Column(name = "data_criacao")
-
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
     @Column(name = "contato")
     private String contact;
 
@@ -71,7 +70,7 @@ public class User implements UserDetails {
     )
     private List<Profile> profiles;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_usuario")
     private List<Vehicle> vehicles;
 

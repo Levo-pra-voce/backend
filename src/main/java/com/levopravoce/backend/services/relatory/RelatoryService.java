@@ -9,8 +9,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
@@ -30,12 +32,16 @@ public class RelatoryService {
 
   public Page<RelatoryDTO> getOrdersByDeliveryMan(LocalDate deliveryDate, Pageable pageable) {
     User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
-    Page<Order> relatoryDTOPage =
-        deliveryDate == null ? orderRepository.findAllByDeliveryMan(currentUser.getId(),
-        pageable)
-        : orderRepository.findAllByDeliveryManAndDeliveryDate(currentUser.getId(), deliveryDate,
-            pageable);
-    return relatoryDTOPage.map(this::createRelatoryDTO);
+    if (deliveryDate == null) {
+      return orderRepository.findAllByDeliveryMan(currentUser.getId(), pageable)
+          .map(this::createRelatoryDTO);
+    }
+
+    LocalDateTime inicialDate = deliveryDate.atTime(0, 0, 0);
+    LocalDateTime finalDate = deliveryDate.atTime(23, 59, 59);
+    return orderRepository.findAllByDeliveryManAndDeliveryDate(currentUser.getId(), inicialDate,
+            finalDate, pageable)
+        .map(this::createRelatoryDTO);
   }
 
   public ByteArrayResource getRelatoryXlsx(LocalDate deliveryDate) throws IOException {
@@ -76,7 +82,12 @@ public class RelatoryService {
     return RelatoryDTO.builder()
         .clientName(order.getClient().getName())
         .value(order.getValue())
-        .deliveryDate(order.getDeliveryDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+        .deliveryDate(Optional.ofNullable(order.getDeliveryDate())
+            .map(date -> {
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+              return date.toLocalDate().format(formatter);
+            })
+            .orElse(null))
         .build();
   }
 }

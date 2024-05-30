@@ -10,6 +10,7 @@ import com.levopravoce.backend.security.JwtTokenUtil;
 import com.levopravoce.backend.services.authenticate.dto.JwtResponseDTO;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,7 @@ public class DeliveryUserService implements UserManagement {
             .password(passwordEncoder.encode(userDTO.getPassword()))
             .contact(userDTO.getPhone())
             .status(Status.ACTIVE)
+            .creationDate(LocalDateTime.now())
             .userType(UserType.ENTREGADOR)
             .addresses(List.of(userUtils.buildAddressByUserDTO(userDTO)))
             .vehicles(List.of(Objects.requireNonNull(userDTO.getVehicle())))

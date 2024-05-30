@@ -41,7 +41,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     runtimeOnly("ch.qos.logback:logback-classic")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation(kotlin("stdlib-jdk8"))
     runtimeOnly("com.h2database:h2")
     implementation("com.h2database:h2:1.3.148")
