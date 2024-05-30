@@ -42,7 +42,7 @@ public class UserUtils {
         .build();
   }
 
-  public void validateUserFields(UserDTO userDTO) {
+  public void validateCommonUserFields(UserDTO userDTO) {
     validateName(userDTO.getName());
     validateEmail(userDTO.getEmail());
     validatePassword(userDTO.getPassword());
@@ -73,6 +73,16 @@ public class UserUtils {
 
     if (passwordIsInvalid(password)) {
       throw new IllegalArgumentException("Senha deve conter ao menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um número");
+    }
+  }
+
+  public void validateCnh(String cnh) {
+    if (cnh == null || cnh.isEmpty()) {
+      throw new IllegalArgumentException("CNH é obrigatória");
+    }
+
+    if (cnh.length() != 11) {
+      throw new IllegalArgumentException("CNH deve conter 11 dígitos");
     }
   }
 

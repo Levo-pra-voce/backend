@@ -45,9 +45,14 @@ public class Vehicle {
     @Column(name = "ativo")
     private boolean active = false;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_tipo_veiculo")
-    private VehicleType vehicleType;
+    @Column(name = "altura")
+    private Double height;
+
+    @Column(name = "largura")
+    private Double width;
+
+    @Column(name = "peso_maximo")
+    private Double maxWeight;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_veiculo")

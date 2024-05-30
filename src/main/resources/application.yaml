@@ -34,7 +34,6 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-#    username: Luiz Eduardo Sagaz Carvalho
     username: levopravoceoficial@gmail.com
     password: crlebwntrciljate
     properties:

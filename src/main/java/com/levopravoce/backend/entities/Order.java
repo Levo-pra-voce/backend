@@ -1,9 +1,22 @@
 package com.levopravoce.backend.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.LocalDate;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -27,7 +40,7 @@ public class Order {
     private double maxWeight;
 
     @Column(name = "data_entrega")
-    private LocalDate deliveryDate;
+    private LocalDateTime deliveryDate;
 
     @Column(name = "seguro")
     private Boolean haveSecurity;
@@ -39,15 +52,15 @@ public class Order {
     @Column(name = "valor")
     private double value;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_entregador")
     private User deliveryman;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_cliente")
     private User client;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_veiculo")
     private Vehicle vehicle;
 
@@ -56,6 +69,6 @@ public class Order {
     private Payment payment;
 
     public enum OrderStatus {
-        PENDING, IN_PROGRESS, DELIVERED, CANCELED
+        ESPERANDO, EM_PROGRESSO, ENTREGADO, CANCELADO
     }
 }

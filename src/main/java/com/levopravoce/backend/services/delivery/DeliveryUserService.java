@@ -1,6 +1,7 @@
 package com.levopravoce.backend.services.delivery;
 
 import com.levopravoce.backend.common.UserUtils;
+import com.levopravoce.backend.common.VehicleUtils;
 import com.levopravoce.backend.entities.Status;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
@@ -9,6 +10,7 @@ import com.levopravoce.backend.security.JwtTokenUtil;
 import com.levopravoce.backend.services.authenticate.dto.JwtResponseDTO;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -18,21 +20,16 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DeliveryUserService implements UserManagement {
-
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenUtil jwtService;
   private final UserUtils userUtils;
+  private final VehicleUtils vehicleUtils;
 
   @Override
   public JwtResponseDTO save(UserDTO userDTO) {
-
-    userUtils.validateUserFields(userDTO);
-
-    if (userDTO.getVehicle() == null) {
-      throw new IllegalArgumentException("Veiculo não informado");
-    }
-
+    userUtils.validateCommonUserFields(userDTO);
+    userUtils.validateCnh(userDTO.getCnh());
     if (userRepository.existsByEmail(userDTO.getEmail())) {
       throw new IllegalArgumentException("Email já foi cadastrado");
     }
@@ -40,6 +37,16 @@ public class DeliveryUserService implements UserManagement {
     if (userRepository.existsByCpf(userDTO.getCpf())) {
       throw new IllegalArgumentException("CPF já foi cadastrado");
     }
+
+    if (userRepository.existsByCnh(userDTO.getCnh())) {
+      throw new IllegalArgumentException("CNH já foi cadastrada");
+    }
+
+    if (userDTO.getVehicle() == null) {
+      throw new IllegalArgumentException("Veiculo não informado");
+    }
+
+    vehicleUtils.validateVehicle(userDTO.getVehicle());
 
     User user =
         User.builder()
@@ -50,6 +57,7 @@ public class DeliveryUserService implements UserManagement {
             .password(passwordEncoder.encode(userDTO.getPassword()))
             .contact(userDTO.getPhone())
             .status(Status.ACTIVE)
+            .creationDate(LocalDateTime.now())
             .userType(UserType.ENTREGADOR)
             .addresses(List.of(userUtils.buildAddressByUserDTO(userDTO)))
             .vehicles(List.of(Objects.requireNonNull(userDTO.getVehicle())))
@@ -68,9 +76,7 @@ public class DeliveryUserService implements UserManagement {
     user.setName(updatedUser.getName());
     user.setContact(updatedUser.getPhone());
 
-    var savedUser = userRepository.save(user);
-
-    savedUser.toDTO();
+    userRepository.save(user);
   }
 
   @Override

@@ -10,6 +10,7 @@ import com.levopravoce.backend.security.JwtTokenUtil;
 import com.levopravoce.backend.services.authenticate.dto.JwtResponseDTO;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class ClientUserService implements UserManagement {
 
   @Override
   public JwtResponseDTO save(UserDTO userDTO) {
-    userUtils.validateUserFields(userDTO);
+    userUtils.validateCommonUserFields(userDTO);
 
     if (userRepository.existsByEmail(userDTO.getEmail())) {
       throw new IllegalArgumentException("Email já foi cadastrado");
@@ -46,6 +47,7 @@ public class ClientUserService implements UserManagement {
             .cpf(userDTO.getCpf())
             .name(userDTO.getName())
             .email(userDTO.getEmail())
+            .creationDate(LocalDateTime.now())
             .password(passwordEncoder.encode(userDTO.getPassword()))
             .contact(userDTO.getPhone())
             .status(Status.ACTIVE)

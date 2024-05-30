@@ -101,6 +101,9 @@ create table veiculo (
                          data_criacao    timestamp default now(),
                          ativo           boolean,
                          cnh             text,
+                         altura          DOUBLE PRECISION,
+                         largura         DOUBLE PRECISION,
+                         peso_maximo     DOUBLE PRECISION,
                          foreign key (id_usuario) references usuario (id),
                          foreign key (id_tipo_veiculo) references tipo_veiculo (id)
 );
@@ -122,16 +125,16 @@ drop table if exists pagamento cascade;
 
 create table pagamento (
                            id           bigserial primary key,
-                           id_usuario_pagador   bigint,
-                           id_usuario_recebedor bigint,
+                           id_cliente   bigint,
+                           id_entregador bigint,
                            id_veiculo   bigint,
                            valor        numeric(10, 2),
                            data_criacao timestamp default now(),
                            ativo        boolean,
                            status       text,
-                           foreign key (id_usuario_pagador) references usuario (id),
+                           foreign key (id_cliente) references usuario (id),
                            foreign key (id_veiculo) references veiculo (id),
-                           foreign key (id_usuario_recebedor) references usuario (id)
+                           foreign key (id_entregador) references usuario (id)
 );
 
 drop table if exists pedido cascade;

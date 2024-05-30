@@ -3,11 +3,15 @@ package com.levopravoce.backend.services.authenticate.dto;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.entities.Vehicle;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDTO {
 
   private Long id;

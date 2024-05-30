@@ -19,24 +19,21 @@ repositories {
 }
 
 dependencies {
-    // LOMBOK
-    compileOnly("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
-    testCompileOnly("org.projectlombok:lombok:1.18.30")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
-
+    // Spring
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.postgresql:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-mail:3.1.5")
 
+    // JWT - Authentication
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
 
-    implementation("javax.xml.bind:jaxb-api:2.3.1")
-    implementation("org.springframework.boot:spring-boot-starter-websocket")
-    implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    implementation("org.mapstruct:mapstruct:1.5.0.Final")
-
+    // Spring - Test
     runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
@@ -44,23 +41,39 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     runtimeOnly("ch.qos.logback:logback-classic")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation(kotlin("stdlib-jdk8"))
     runtimeOnly("com.h2database:h2")
     implementation("com.h2database:h2:1.3.148")
 
-    implementation("com.google.guava:guava:latest.release")
-
-    implementation("org.springframework.boot:spring-boot-starter-mail:3.1.5")
-
-    implementation("org.apache.commons:commons-lang3:3.14.0")
-
+    // MapStruct - generate mapper
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+
+    // LOMBOK
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    testCompileOnly("org.projectlombok:lombok:1.18.30")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
+
+    // guava - cache
+    implementation("com.google.guava:guava:latest.release")
+
+    // Apache Commons
+    implementation("org.apache.commons:commons-lang3:3.14.0")
+
+
+    // Apache POI - Excel
+    implementation("org.apache.poi:poi:5.2.5")
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
+
+    // Flyway - Database migration
+    implementation("org.flywaydb:flyway-core:10.13.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.13.0")
+
+    // Extras
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.17.1")
+    implementation("javax.persistence:javax.persistence-api:2.2")
 }
 
 group = "com.levo-pra-voce"
