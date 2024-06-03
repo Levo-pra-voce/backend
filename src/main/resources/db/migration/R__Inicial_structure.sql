@@ -101,6 +101,7 @@ create table veiculo (
                          data_criacao    timestamp default now(),
                          ativo           boolean,
                          cnh             text,
+                         foto            bytea,
                          altura          DOUBLE PRECISION,
                          largura         DOUBLE PRECISION,
                          peso_maximo     DOUBLE PRECISION,
