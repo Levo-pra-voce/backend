@@ -7,13 +7,11 @@ import com.levopravoce.backend.repository.OrderRepository;
 import com.levopravoce.backend.services.relatory.dto.RelatoryDTO;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -46,10 +44,16 @@ public class RelatoryService {
 
   public ByteArrayResource getRelatoryXlsx(LocalDate deliveryDate) throws IOException {
     User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
-    List<Order> orders =
-        deliveryDate == null ? orderRepository.findAllByDeliveryMan(currentUser.getId())
-            : orderRepository.findAllByDeliveryManAndDeliveryDate(currentUser.getId(),
-                deliveryDate);
+
+    List<Order> orders;
+    if (deliveryDate == null) {
+      orders = orderRepository.findAllByDeliveryMan(currentUser.getId());
+    } else {
+      LocalDateTime inicialDate = deliveryDate.atTime(0, 0, 0);
+      LocalDateTime finalDate = deliveryDate.atTime(23, 59, 59);
+      orders = orderRepository.findAllByDeliveryManAndDeliveryDate(currentUser.getId(), inicialDate,
+              finalDate);
+    }
 
     try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
       Sheet sheet = workbook.createSheet("Orders");
@@ -66,10 +70,11 @@ public class RelatoryService {
           Row row = sheet.createRow(rowNumber++);
           row.createCell(0).setCellValue(order.getClient().getName());
           row.createCell(1).setCellValue(order.getValue());
-          SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-          sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-          row.createCell(2).setCellValue(sdf.format(order.getDeliveryDate()));
+          row.createCell(2).setCellValue(Optional.ofNullable(order.getDeliveryDate())
+              .map(date -> date.toLocalDate().format(formatter))
+              .orElse(null));
         }
       }
 

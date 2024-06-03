@@ -8,9 +8,9 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-levo-pra-voce:5432/postgres
       - SPRING_DATASOURCE_JDBCURL=jdbc:postgresql://postgres-levo-pra-voce:5432/postgres
     ports:
-      - "8080:8080"
+      - "8888:8888"
     expose:
-      - "8080:8080"
+      - "8888:8888"
     depends_on:
       - postgres
 

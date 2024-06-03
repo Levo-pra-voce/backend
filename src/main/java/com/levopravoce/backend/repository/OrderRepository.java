@@ -25,6 +25,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             value = """
         SELECT u FROM Order u
         WHERE u.deliveryman.id = :deliveryId
+              AND u.status = 'ENTREGADO'
+              AND u.payment.status = 'PAGO'
     """)
     List<Order> findAllByDeliveryMan(Long deliveryId);
 
@@ -32,9 +34,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             value = """
                     SELECT u FROM Order u
                     WHERE u.deliveryman.id = :deliveryId
-                          AND u.deliveryDate = :deliveryDate AND u.status = 'ENTREGADO'
+                          AND u.deliveryDate BETWEEN :inicialDate AND :finalDate
+                          AND u.status = 'ENTREGADO'
+                          AND u.payment.status = 'PAGO'
                 """)
-    List<Order> findAllByDeliveryManAndDeliveryDate(Long deliveryId, LocalDate deliveryDate);
+    List<Order> findAllByDeliveryManAndDeliveryDate(Long deliveryId, LocalDateTime inicialDate, LocalDateTime finalDate);
 
     @Query(
             value = """
