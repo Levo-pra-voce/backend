@@ -70,6 +70,9 @@ dependencies {
     implementation("org.flywaydb:flyway-core:10.13.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.13.0")
 
+    // Jackson
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1")
+
     // Extras
     implementation("javax.xml.bind:jaxb-api:2.3.1")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.17.1")

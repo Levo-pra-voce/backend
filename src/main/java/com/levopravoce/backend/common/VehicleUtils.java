@@ -3,6 +3,7 @@ package com.levopravoce.backend.common;
 import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -85,6 +86,10 @@ public class VehicleUtils {
 
     if (renavam.length() != 11) {
       throw new IllegalArgumentException("Renavam deve ter 11 caracteres");
+    }
+
+    if (!NumberUtils.isDigits(renavam)) {
+      throw new IllegalArgumentException("Renavam deve conter apenas números");
     }
 
     boolean existRenavam = vehicleRepository.existsByRenavam(renavam);
