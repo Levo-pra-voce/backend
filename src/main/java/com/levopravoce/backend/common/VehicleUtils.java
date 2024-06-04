@@ -25,6 +25,10 @@ public class VehicleUtils {
       throw new IllegalArgumentException("Placa é obrigatória");
     }
 
+    if (plate.length() != 7) {
+      throw new IllegalArgumentException("Placa deve ter 7 caracteres");
+    }
+
     boolean existPlate = vehicleRepository.existsByPlate(plate);
 
     if (existPlate) {
