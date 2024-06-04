@@ -5,6 +5,7 @@ import com.levopravoce.backend.common.VehicleUtils;
 import com.levopravoce.backend.entities.Status;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
+import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.repository.UserRepository;
 import com.levopravoce.backend.repository.VehicleRepository;
 import com.levopravoce.backend.security.JwtTokenUtil;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DeliveryUserService implements UserManagement {
+
   private final UserRepository userRepository;
   private final VehicleRepository vehicleRepository;
   private final PasswordEncoder passwordEncoder;
@@ -89,14 +91,18 @@ public class DeliveryUserService implements UserManagement {
 
     vehicleUtils.validateNewVehicle(updatedUserDTO.getVehicle());
     vehicleRepository.disableAllVehiclesByUserId(currentUser.getId());
-    if (currentUser.getVehicles() == null) {
-      currentUser.setVehicles(List.of(updatedUserDTO.getVehicle()));
+    List<Vehicle> vehicles = currentUser.getVehicles();
+    Vehicle updatedVehicle = updatedUserDTO.getVehicle();
+    updatedVehicle.setCreationDate(LocalDateTime.now());
+    if (vehicles == null) {
+      currentUser.setVehicles(List.of(updatedVehicle));
     } else {
-      currentUser.getVehicles().add(updatedUserDTO.getVehicle());
+      updatedVehicle.setUser(currentUser);
+      updatedVehicle.setActive(true);
+      this.vehicleRepository.save(updatedVehicle);
+      vehicles.forEach(vehicle -> vehicle.setActive(false));
     }
-
-    var savedUser = userRepository.save(currentUser);
-    savedUser.toDTO();
+    userRepository.save(currentUser);
   }
 
   @Override
