@@ -1,20 +1,36 @@
 package com.levopravoce.backend.entities;
 
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
-import java.util.Date;
-import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @Setter
@@ -24,142 +40,128 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "usuario")
 public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(name = "senha")
-    private String password;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "email")
-    private String email;
+  @Column(name = "senha")
+  private String password;
 
-    @Column(name = "nome")
-    private String name;
+  @Column(name = "email")
+  private String email;
 
-    @Column(name = "cpf")
-    private String cpf;
+  @Column(name = "nome")
+  private String name;
 
-    @Column(name = "cnh")
-    private String cnh;
+  @Column(name = "cpf")
+  private String cpf;
 
-    @Enumerated(EnumType.STRING)
-    private Status status = Status.INACTIVE;
+  @Column(name = "cnh")
+  private String cnh;
 
-    @Column(name = "tipo")
-    @Enumerated(EnumType.STRING)
-    private UserType userType;
+  @Enumerated(EnumType.STRING)
+  private Status status = Status.INACTIVE;
 
-    @Column(name = "ativo")
-    private Boolean active = false;
+  @Column(name = "tipo")
+  @Enumerated(EnumType.STRING)
+  private UserType userType;
 
-    @Column(name = "data_criacao")
-    private LocalDateTime creationDate;
-    @Column(name = "contato")
-    private String contact;
+  @Column(name = "ativo")
+  private Boolean active = false;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_usuario")
-    private List<Address> addresses;
+  @Column(name = "data_criacao")
+  private LocalDateTime creationDate;
+  @Column(name = "contato")
+  private String contact;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "perfil_usuario",
-            joinColumns = @JoinColumn(name = "id_usuario"),
-            inverseJoinColumns = @JoinColumn(name = "id_perfil")
-    )
-    private List<Profile> profiles;
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "id_usuario")
+  private List<Address> addresses;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "id_usuario")
-    private List<Vehicle> vehicles;
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "perfil_usuario", joinColumns = @JoinColumn(name = "id_usuario"), inverseJoinColumns = @JoinColumn(name = "id_perfil"))
+  private List<Profile> profiles;
 
-    @OneToMany
-    @JoinColumn(name = "id_usuario")
-    private List<Rating> ratings;
+  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @JoinColumn(name = "id_usuario")
+  private List<Vehicle> vehicles;
 
-    @Transient
-    private Date expirationDate;
+  @OneToMany
+  @JoinColumn(name = "id_usuario")
+  private List<Rating> ratings;
 
-    @Column(name = "foto")
-    private byte[] profilePicture;
+  @Transient
+  private Date expirationDate;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Optional.ofNullable
-                (this.profiles).map(profiles -> profiles.stream()
-                .map(
-                    profile -> profile.getPermissions().stream()
-                        .map(Permission::getName)
-                        .map(SimpleGrantedAuthority::new)
-                        .toList()
-                ).flatMap(Collection::stream)
-            .collect(Collectors.toSet())
-        ).orElse(Collections.emptySet());
-    }
-    @Override
-    public boolean isAccountNonExpired() {
-        return this.isUserActive();
-    }
-    @Override
-    public boolean isAccountNonLocked() {
-        return this.isUserActive();
-    }
-    @Override
-    public boolean isCredentialsNonExpired() {
-        if (this.expirationDate == null) {
-            return true;
-        }
+  @Column(name = "foto")
+  private byte[] profilePicture;
 
-        return this.expirationDate.after(new Date());
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return Optional.ofNullable(this.profiles).map(profiles -> profiles.stream().map(
+            profile -> profile.getPermissions().stream().map(Permission::getName)
+                .map(SimpleGrantedAuthority::new).toList()).flatMap(Collection::stream)
+        .collect(Collectors.toSet())).orElse(Collections.emptySet());
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return this.isUserActive();
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return this.isUserActive();
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    if (this.expirationDate == null) {
+      return true;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.isUserActive();
-    }
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
+    return this.expirationDate.after(new Date());
+  }
 
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
+  @Override
+  public boolean isEnabled() {
+    return this.isUserActive();
+  }
 
-    private boolean isUserActive() {
-        return Optional.ofNullable(this.status).map(status -> status.equals(Status.ACTIVE)).orElse(false);
-    }
+  @Override
+  public String getUsername() {
+    return this.email;
+  }
 
-    public List<Vehicle> getVehicles() {
-        if (this.vehicles != null) {
-            return this.vehicles.stream().filter(Vehicle::isActive).toList();
-        }
-        return this.vehicles;
-    }
+  @Override
+  public String getPassword() {
+    return this.password;
+  }
 
-    public UserDTO toDTO() {
+  private boolean isUserActive() {
+    return Optional.ofNullable(this.status).map(status -> status.equals(Status.ACTIVE))
+        .orElse(false);
+  }
+
+  public List<Vehicle> getVehicles() {
+    if (this.vehicles != null) {
+      return this.vehicles.stream().filter(Vehicle::isActive).toList();
+    }
+    return this.vehicles;
+  }
+
+  public UserDTO toDTO() {
     Address address = this.getAddresses().stream().findFirst().orElse(null);
 
-    return UserDTO.builder()
-        .id(this.getId())
-        .email(this.getEmail())
-        .name(this.getName())
+    return UserDTO.builder().id(this.getId()).email(this.getEmail()).name(this.getName())
         .zipCode(Optional.ofNullable(address).map(Address::getZipCode).orElse(null))
         .city(Optional.ofNullable(address).map(Address::getCity).orElse(null))
         .complement(Optional.ofNullable(address).map(Address::getComplement).orElse(null))
-        .phone(this.getContact())
-        .vehicle(Optional.ofNullable(this.getVehicles())
-            .orElse(List.of())
-            .stream().findFirst()
-            .orElse(null))
-        .status(this.getStatus().name())
-        .userType(this.getUserType())
-        .street(Optional.ofNullable(this.getAddresses())
-            .orElse(List.of())
-            .stream().findFirst()
-            .map(Address::getStreet).orElse(null))
-        .build();
-    }
+        .phone(this.getContact()).vehicle(
+            Optional.ofNullable(this.getVehicles()).orElse(List.of()).stream().findFirst()
+                .orElse(null)).status(this.getStatus().name()).userType(this.getUserType()).street(
+            Optional.ofNullable(this.getAddresses()).orElse(List.of()).stream().findFirst()
+                .map(Address::getStreet).orElse(null)).build();
+  }
 }
