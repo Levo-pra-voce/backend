@@ -70,7 +70,7 @@ public class User implements UserDetails {
     )
     private List<Profile> profiles;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "id_usuario")
     private List<Vehicle> vehicles;
 
@@ -130,6 +130,13 @@ public class User implements UserDetails {
 
     private boolean isUserActive() {
         return Optional.ofNullable(this.status).map(status -> status.equals(Status.ACTIVE)).orElse(false);
+    }
+
+    public List<Vehicle> getVehicles() {
+        if (this.vehicles != null) {
+            return this.vehicles.stream().filter(Vehicle::isActive).toList();
+        }
+        return this.vehicles;
     }
 
     public UserDTO toDTO() {

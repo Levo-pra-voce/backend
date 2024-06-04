@@ -1,13 +1,16 @@
 package com.levopravoce.backend.common;
 
 import com.levopravoce.backend.entities.Vehicle;
+import com.levopravoce.backend.repository.VehicleRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
-
 public class VehicleUtils {
+  private final VehicleRepository vehicleRepository;
 
-  public void validateVehicle(Vehicle vehicle) {
+  public void validateNewVehicle(Vehicle vehicle) {
     validatePlate(vehicle.getPlate());
     validateModel(vehicle.getModel());
     validateColor(vehicle.getColor());
@@ -20,6 +23,12 @@ public class VehicleUtils {
   public void validatePlate(String plate) {
     if (plate == null || plate.isEmpty()) {
       throw new IllegalArgumentException("Placa é obrigatória");
+    }
+
+    boolean existPlate = vehicleRepository.existsByPlate(plate);
+
+    if (existPlate) {
+      throw new IllegalArgumentException("Placa já cadastrada");
     }
   }
 
@@ -72,6 +81,11 @@ public class VehicleUtils {
 
     if (renavam.length() != 11) {
       throw new IllegalArgumentException("Renavam deve ter 11 caracteres");
+    }
+
+    boolean existRenavam = vehicleRepository.existsByRenavam(renavam);
+    if (existRenavam) {
+      throw new IllegalArgumentException("Renavam já cadastrado");
     }
   }
 }
