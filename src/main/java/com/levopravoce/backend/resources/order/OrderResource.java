@@ -16,9 +16,9 @@ public class OrderResource {
     private final OrderService orderService;
 
     @PostMapping
-    public void createOrder(
+    public OrderDTO createOrder(
             @RequestBody OrderDTO orderDTO
     ) {
-        this.orderService.createOrder(orderDTO);
+        return this.orderService.createOrder(orderDTO);
     }
 }
