@@ -5,11 +5,14 @@ import com.levopravoce.backend.common.VehicleUtils;
 import com.levopravoce.backend.entities.Status;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
+import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.repository.UserRepository;
+import com.levopravoce.backend.repository.VehicleRepository;
 import com.levopravoce.backend.security.JwtTokenUtil;
 import com.levopravoce.backend.services.authenticate.dto.JwtResponseDTO;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -20,7 +23,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DeliveryUserService implements UserManagement {
+
   private final UserRepository userRepository;
+  private final VehicleRepository vehicleRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenUtil jwtService;
   private final UserUtils userUtils;
@@ -46,8 +51,7 @@ public class DeliveryUserService implements UserManagement {
       throw new IllegalArgumentException("Veiculo não informado");
     }
 
-    vehicleUtils.validateVehicle(userDTO.getVehicle());
-
+    vehicleUtils.validateNewVehicle(userDTO.getVehicle());
     User user =
         User.builder()
             .cpf(userDTO.getCpf())
@@ -68,21 +72,42 @@ public class DeliveryUserService implements UserManagement {
     return JwtResponseDTO.builder().token(jwt).userType(UserType.ENTREGADOR).build();
   }
 
+  @Transactional
   @Override
-  public void update(User user, UserDTO updatedUser) {
-    userUtils.validateName(updatedUser.getName());
-    userUtils.validatePhone(updatedUser.getPhone());
+  public void update(User currentUser, UserDTO updatedUserDTO) {
+    if (updatedUserDTO.getVehicle() == null) {
+      throw new IllegalArgumentException("Veiculo não informado");
+    }
 
-    user.setName(updatedUser.getName());
-    user.setContact(updatedUser.getPhone());
+    if (!Objects.isNull(updatedUserDTO.getName())) {
+      userUtils.validateName(updatedUserDTO.getName());
+      currentUser.setName(updatedUserDTO.getName());
+    }
 
-    userRepository.save(user);
+    if (!Objects.isNull(updatedUserDTO.getPhone())) {
+      userUtils.validatePhone(updatedUserDTO.getPhone());
+      currentUser.setContact(updatedUserDTO.getPhone());
+    }
+
+    vehicleUtils.validateNewVehicle(updatedUserDTO.getVehicle());
+    vehicleRepository.disableAllVehiclesByUserId(currentUser.getId());
+    List<Vehicle> vehicles = currentUser.getVehicles();
+    Vehicle updatedVehicle = updatedUserDTO.getVehicle();
+    updatedVehicle.setCreationDate(LocalDateTime.now());
+    if (vehicles == null) {
+      currentUser.setVehicles(List.of(updatedVehicle));
+    } else {
+      updatedVehicle.setUser(currentUser);
+      updatedVehicle.setActive(true);
+      this.vehicleRepository.save(updatedVehicle);
+      vehicles.forEach(vehicle -> vehicle.setActive(false));
+    }
+    userRepository.save(currentUser);
   }
 
   @Override
   public void delete(User user) {
     user.setStatus(Status.INACTIVE);
-
     userRepository.save(user);
   }
 }
