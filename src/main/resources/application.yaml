@@ -45,5 +45,10 @@ spring:
 jwt:
   secret: tnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7To
 
+google:
+  map:
+    api:
+      key: AIzaSyDLUo_Xks5VkIA9XU_tn__vE99L1p8tsWY
+
 server:
   port: 8888

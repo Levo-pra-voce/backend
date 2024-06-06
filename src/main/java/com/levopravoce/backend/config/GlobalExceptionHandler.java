@@ -13,6 +13,7 @@ public class GlobalExceptionHandler {
       @ExceptionHandler({ Exception.class })
       public final ResponseEntity<ApiError> handleException(Exception ex, WebRequest request) {
           ApiError apiError = new ApiError(500, ex.getMessage());
+          ex.printStackTrace();
           return ResponseEntity.status(apiError.status()).body(apiError);
       }
 }
