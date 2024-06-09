@@ -41,6 +41,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "usuario")
 public class User implements UserDetails {
 
+  public User(Long id) {
+    this.id = id;
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

@@ -21,7 +21,7 @@ public class OrderDTO {
     private LocalDate deliveryDate;
     private Boolean haveSecurity;
     private Order.OrderStatus status;
-    private double value;
+    private Double value;
     private UserDTO deliveryman;
     private UserDTO client;
 //    private VehicleDTO vehicle;
