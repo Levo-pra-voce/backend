@@ -24,6 +24,11 @@ public class OrderDTO {
     private Double value;
     private UserDTO deliveryman;
     private UserDTO client;
+    private Double originLatitude;
+    private Double originLongitude;
+    private Double destinationLatitude;
+    private Double destinationLongitude;
+
 //    private VehicleDTO vehicle;
 //    private PaymentDTO payment;
 }
