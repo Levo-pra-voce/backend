@@ -31,5 +31,7 @@ public class UserDTO {
   private Vehicle vehicle;
   private String token;
   private String addressNumber;
+  private Double priceBase;
+  private Double pricePerKm;
   private byte[] profilePicture;
 }
