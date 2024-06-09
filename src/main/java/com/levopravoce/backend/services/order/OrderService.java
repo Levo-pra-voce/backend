@@ -21,10 +21,9 @@ public class OrderService {
     private final OrderUtils orderUtils;
 
     public OrderDTO createOrder(OrderDTO orderDTO) {
-        orderUtils.validateFields(orderDTO);
+        orderUtils.validateNewOrder(orderDTO);
 
         User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
-
         if (!Objects.equals(currentUser.getUserType(), UserType.CLIENTE)) {
             throw new RuntimeException("Apenas clientes podem criar pedidos.");
         }
@@ -35,6 +34,7 @@ public class OrderService {
         }
 
         Order order = orderMapper.toEntity(orderDTO);
+        order.setClient(currentUser);
         return orderMapper.toDTO(orderRepository.save(order));
     }
 

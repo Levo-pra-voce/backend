@@ -31,13 +31,13 @@ public class Order {
     private Long id;
 
     @Column(name = "altura")
-    private double height;
+    private Double height;
 
     @Column(name = "largura")
-    private double width;
+    private Double width;
 
     @Column(name = "peso_maximo")
-    private double maxWeight;
+    private Double maxWeight;
 
     @Column(name = "data_entrega")
     private LocalDateTime deliveryDate;
@@ -50,7 +50,7 @@ public class Order {
     private OrderStatus status;
 
     @Column(name = "valor")
-    private double value;
+    private Double value;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_entregador")
