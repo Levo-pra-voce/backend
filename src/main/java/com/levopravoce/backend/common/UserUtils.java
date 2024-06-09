@@ -30,7 +30,7 @@ public class UserUtils {
     }
 
     return Address.builder()
-        .complement(viaCepResponse.getComplemento())
+        .complement(userDTO.getComplement())
         .city(viaCepResponse.getLocalidade())
         .state(viaCepResponse.getUf())
         .street(viaCepResponse.getLogradouro())
