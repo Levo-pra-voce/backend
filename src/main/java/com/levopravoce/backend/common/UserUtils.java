@@ -25,7 +25,7 @@ public class UserUtils {
     var viaCepResponse = restTemplate.getForObject(VIA_CEP_URL + userDTO.getZipCode() + "/json",
         ViaCepResponseDTO.class);
 
-    if (viaCepResponse == null) {
+    if (viaCepResponse == null || viaCepResponse.getCep() == null) {
       throw new IllegalArgumentException("CEP inválido");
     }
 
