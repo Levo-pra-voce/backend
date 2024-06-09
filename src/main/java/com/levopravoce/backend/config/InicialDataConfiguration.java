@@ -47,6 +47,8 @@ public class InicialDataConfiguration {
           .height(1.9)
           .width(1.6)
           .maxWeight(800.0)
+          .priceBase(100.0)
+          .pricePerKm(10.0)
           .build();
 
       // Criação do usuário entregador

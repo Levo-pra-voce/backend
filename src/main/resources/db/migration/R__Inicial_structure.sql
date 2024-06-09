@@ -105,6 +105,8 @@ create table veiculo (
                          altura          DOUBLE PRECISION,
                          largura         DOUBLE PRECISION,
                          peso_maximo     DOUBLE PRECISION,
+                         preco_base      DOUBLE PRECISION,
+                         preco_por_km    DOUBLE PRECISION,
                          foreign key (id_usuario) references usuario (id),
                          foreign key (id_tipo_veiculo) references tipo_veiculo (id)
 );

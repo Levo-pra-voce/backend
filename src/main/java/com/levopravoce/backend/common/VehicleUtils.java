@@ -19,6 +19,26 @@ public class VehicleUtils {
     validateWidth(vehicle.getWidth());
     validateMaxWeight(vehicle.getMaxWeight());
     validateRenavam(vehicle.getRenavam());
+    validatePriceBase(vehicle.getPriceBase());
+    validatePricePerKm(vehicle.getPricePerKm());
+  }
+
+  public void validatePricePerKm(Double price) {
+    if (price == null) {
+      throw new IllegalArgumentException("Preço cobrado por quilômetro rodado é obrigatório");
+    }
+    if (price < 0) {
+      throw new IllegalArgumentException("Preço cobrado por quilômetro rodado tem que ser maior que zero");
+    }
+  }
+
+  public void validatePriceBase(Double price) {
+    if (price == null) {
+      throw new IllegalArgumentException("Preço base por viagem é obrigatório");
+    }
+    if (price < 0) {
+      throw new IllegalArgumentException("Preço base por viagem tem que ser maior que zero");
+    }
   }
 
   public void validatePlate(String plate) {
