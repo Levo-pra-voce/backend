@@ -1,8 +1,6 @@
 logging:
   file:
     name: /tmp/logs/spring-boot-logging.log
-  level:
-    root: debug
 
 spring:
   autoconfigure:
@@ -52,3 +50,6 @@ google:
 
 server:
   port: 8888
+
+config:
+  mockuser: false

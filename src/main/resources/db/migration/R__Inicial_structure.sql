@@ -1,7 +1,7 @@
 drop table if exists usuario cascade;
 
 create table usuario (
-                         id            bigserial primary key,
+                         id            serial primary key,
                          email         text unique,
                          senha         text,
                          cpf           text,
@@ -19,7 +19,7 @@ create table usuario (
 drop table if exists endereco cascade;
 
 create table endereco (
-                          id           bigserial primary key,
+                          id           serial primary key,
                           id_usuario   bigint,
                           cep          text,
                           logradouro   text,
@@ -36,7 +36,7 @@ create table endereco (
 drop table if exists permissao cascade;
 
 create table permissao (
-                           id           bigserial primary key,
+                           id           serial primary key,
                            nome         text,
                            data_criacao timestamp default now(),
                            ativo        boolean
@@ -45,7 +45,7 @@ create table permissao (
 drop table if exists perfil cascade;
 
 create table perfil (
-                        id           bigserial primary key,
+                        id           serial primary key,
                         nome         text,
                         data_criacao timestamp default now(),
                         ativo        boolean
@@ -81,7 +81,7 @@ insert into perfil (nome, data_criacao, ativo) values ('ENTREGADOR', now(), true
 drop table if exists tipo_veiculo cascade;
 
 create table tipo_veiculo (
-                              id           bigserial primary key,
+                              id           serial primary key,
                               nome         text,
                               data_criacao timestamp default now(),
                               ativo        boolean
@@ -90,7 +90,7 @@ create table tipo_veiculo (
 drop table if exists veiculo cascade;
 
 create table veiculo (
-                         id              bigserial primary key,
+                         id              serial primary key,
                          id_usuario      bigint,
                          id_tipo_veiculo bigint,
                          placa           text,
@@ -114,7 +114,7 @@ create table veiculo (
 drop table if exists avaliacao;
 
 create table avaliacao (
-                           id           bigserial primary key,
+                           id           serial primary key,
                            id_usuario   bigint,
                            id_veiculo   bigint,
                            nota         numeric(2, 1),
@@ -127,7 +127,7 @@ create table avaliacao (
 drop table if exists pagamento cascade;
 
 create table pagamento (
-                           id           bigserial primary key,
+                           id           serial primary key,
                            id_cliente   bigint,
                            id_entregador bigint,
                            id_veiculo   bigint,
@@ -144,7 +144,7 @@ drop table if exists pedido cascade;
 
 create table pedido
 (
-    id                  bigserial primary key,
+    id                  serial primary key,
     id_entregador       bigint,
     id_cliente          bigint NOT NULL,
     id_veiculo          bigint,

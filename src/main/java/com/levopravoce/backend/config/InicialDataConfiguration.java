@@ -6,18 +6,21 @@ import com.levopravoce.backend.repository.UserRepository;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
 import com.levopravoce.backend.services.user.UserManagementDeciderService;
-import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
+@ConditionalOnProperty(value="config.mockuser", havingValue="true")
 @RequiredArgsConstructor
-@Configuration
+@Configuration("inicialData")
 public class InicialDataConfiguration {
   private final UserRepository userRepository;
   private final UserManagementDeciderService userManagementDeciderService;
 
-  @PostConstruct
+  @EventListener(ApplicationReadyEvent.class)
   public void init() {
     boolean existAnyUser = userRepository.count() > 0;
 

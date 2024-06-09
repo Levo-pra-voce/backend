@@ -15,7 +15,7 @@ public class GoogleMapsService {
     private static final String BASE_URL = "https://maps.googleapis.com/maps/api/distancematrix/json";
     private final RestTemplate restTemplate;
 
-    @Value("${google.map.api.key}")
+    @Value("${google.map.api.key:invalid_key}")
     private String apiKey;
 
     public GoogleDistanceMatrixResponseDTO getDistance(LatLngDTO origin, LatLngDTO destination) {
