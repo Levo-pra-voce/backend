@@ -13,6 +13,10 @@ public class OrderUtils {
         validateWidth(orderDTO.getWidth());
         validadeMaxWeight(orderDTO.getMaxWeight());
         validateDeliveryDate(orderDTO.getDeliveryDate());
+        validateOriginLatitude(orderDTO.getOriginLatitude());
+        validateOriginLongitude(orderDTO.getOriginLongitude());
+        validateDestinationLatitude(orderDTO.getDestinationLatitude());
+        validateDestinationLongitude(orderDTO.getDestinationLongitude());
     }
 
     public void validateHeight(Double height) {
@@ -36,6 +40,30 @@ public class OrderUtils {
     public void validateDeliveryDate(LocalDate deliveryDate) {
         if (deliveryDate == null || deliveryDate.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("Data de entrega inválida");
+        }
+    }
+
+    public void validateOriginLatitude(Double originLatitude) {
+        if (originLatitude == null || originLatitude < -90 || originLatitude > 90) {
+            throw new IllegalArgumentException("Latitude de origem inválida");
+        }
+    }
+
+    public void validateOriginLongitude(Double originLongitude) {
+        if (originLongitude == null ) {
+            throw new IllegalArgumentException("Longitude de origem inválida");
+        }
+    }
+
+    public void validateDestinationLatitude(Double destinationLatitude) {
+        if (destinationLatitude == null ) {
+            throw new IllegalArgumentException("Latitude de destino inválida");
+        }
+    }
+
+    public void validateDestinationLongitude(Double destinationLongitude) {
+        if (destinationLongitude == null ) {
+            throw new IllegalArgumentException("Longitude de destino inválida");
         }
     }
 }
