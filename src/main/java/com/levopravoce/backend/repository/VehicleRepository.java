@@ -9,16 +9,18 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-    List<Vehicle> getVehiclesByUserId(Long userId);
+  List<Vehicle> getVehiclesByUserId(Long userId);
 
-    @Modifying
-    @Query(value = """
-        UPDATE public.veiculo set ativo = false
-            WHERE id_usuario = :userId
-""", nativeQuery = true)
-    void disableAllVehiclesByUserId(Long userId);
+  @Modifying
+  @Query(value = """
+              UPDATE public.veiculo set ativo = false
+                  WHERE id_usuario = :userId
+      """, nativeQuery = true)
+  void disableAllVehiclesByUserId(Long userId);
 
-    boolean existsByRenavam(String renavam);
+  @Query(value = "select count(*) from veiculo where renavam = :renavam", nativeQuery = true)
+  Long getTotalByRenavam(String renavam);
 
-    boolean existsByPlate(String plate);
+  @Query(value = "select count(*) from veiculo where placa = :plate", nativeQuery = true)
+  Long getTotalByPlate(String plate);
 }

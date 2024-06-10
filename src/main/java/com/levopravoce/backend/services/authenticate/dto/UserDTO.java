@@ -1,6 +1,5 @@
 package com.levopravoce.backend.services.authenticate.dto;
 
-import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.entities.Vehicle;
 import lombok.AllArgsConstructor;
@@ -13,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-
   private Long id;
   private String name;
   private String email;
@@ -33,17 +31,7 @@ public class UserDTO {
   private Vehicle vehicle;
   private String token;
   private String addressNumber;
+  private Double priceBase;
+  private Double pricePerKm;
   private byte[] profilePicture;
-
-  public User toEntity() {
-    return User.builder()
-        .id(id)
-        .name(name)
-        .email(email)
-        .password(password)
-        .cpf(cpf)
-        .cnh(cnh)
-        .contact(phone)
-        .build();
-  }
 }

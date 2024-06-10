@@ -1,8 +1,6 @@
 logging:
   file:
     name: /tmp/logs/spring-boot-logging.log
-  level:
-    root: debug
 
 spring:
   autoconfigure:
@@ -45,5 +43,13 @@ spring:
 jwt:
   secret: tnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7To
 
+google:
+  map:
+    api:
+      key: AIzaSyDLUo_Xks5VkIA9XU_tn__vE99L1p8tsWY
+
 server:
   port: 8888
+
+config:
+  mockuser: false

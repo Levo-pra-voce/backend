@@ -3,6 +3,7 @@ package com.levopravoce.backend.resources.user;
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagementDeciderService;
+import com.levopravoce.backend.services.user.UserForgotPasswordService;
 import com.levopravoce.backend.services.user.UserPasswordService;
 import com.levopravoce.backend.services.user.UserSearchService;
 import com.levopravoce.backend.services.user.dto.PasswordCodeDTO;
@@ -27,8 +28,9 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserResource {
 
   private final UserSearchService userSearchService;
-  private final UserPasswordService userPasswordService;
+  private final UserForgotPasswordService userForgotPasswordService;
   private final UserManagementDeciderService userManagementDeciderService;
+  private final UserPasswordService userPasswordService;
 
   @GetMapping("/me")
   public UserDTO getUser() {
@@ -61,12 +63,12 @@ public class UserResource {
 
   @PostMapping("/forgot-password/{email}")
   public void restorePassword(@PathVariable String email) throws MessagingException {
-    userPasswordService.restorePassword(email);
+    userForgotPasswordService.restorePassword(email);
   }
 
   @PostMapping("/forgot-password/exist-code")
   public ResponseEntity<Void> existCode(@RequestBody PasswordCodeDTO passwordCodeDTO) {
-    boolean existCode = userPasswordService.existCode(passwordCodeDTO.getEmail(), passwordCodeDTO.getCode());
+    boolean existCode = userForgotPasswordService.existCode(passwordCodeDTO.getEmail(), passwordCodeDTO.getCode());
     if (!existCode) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Código não encontrado");
     }
@@ -75,7 +77,12 @@ public class UserResource {
   }
 
   @PutMapping("/forgot-password/change-password")
+  public void forgotChangePassword(@RequestBody PasswordCodeDTO passwordCodeDTO) {
+    userForgotPasswordService.changePassword(passwordCodeDTO);
+  }
+
+  @PutMapping("/change-password")
   public void changePassword(@RequestBody PasswordCodeDTO passwordCodeDTO) {
-    userPasswordService.changePassword(passwordCodeDTO);
+    userPasswordService.changePassword(SecurityUtils.getCurrentUser().orElseThrow(), passwordCodeDTO.getPassword());
   }
 }

@@ -54,6 +54,12 @@ public class Vehicle {
     @Column(name = "peso_maximo")
     private Double maxWeight;
 
+    @Column(name = "preco_base")
+    private Double priceBase;
+
+    @Column(name = "preco_por_km")
+    private Double pricePerKm;
+
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_veiculo")
     private List<Rating> ratings;

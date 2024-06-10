@@ -19,6 +19,8 @@ public class VehicleUtils {
     validateWidth(vehicle.getWidth());
     validateMaxWeight(vehicle.getMaxWeight());
     validateRenavam(vehicle.getRenavam());
+    validatePriceBase(vehicle.getPriceBase());
+    validatePricePerKm(vehicle.getPricePerKm());
   }
 
   public void validatePlate(String plate) {
@@ -30,9 +32,9 @@ public class VehicleUtils {
       throw new IllegalArgumentException("Placa deve ter 7 caracteres");
     }
 
-    boolean existPlate = vehicleRepository.existsByPlate(plate);
+    Long total = vehicleRepository.getTotalByPlate(plate);
 
-    if (existPlate) {
+    if (total > 0) {
       throw new IllegalArgumentException("Placa já cadastrada");
     }
   }
@@ -92,9 +94,28 @@ public class VehicleUtils {
       throw new IllegalArgumentException("Renavam deve conter apenas números");
     }
 
-    boolean existRenavam = vehicleRepository.existsByRenavam(renavam);
-    if (existRenavam) {
+    Long total = vehicleRepository.getTotalByRenavam(renavam);
+    if (total > 0) {
       throw new IllegalArgumentException("Renavam já cadastrado");
+    }
+  }
+
+  public void validatePricePerKm(Double price) {
+    if (price == null) {
+      throw new IllegalArgumentException("Preço cobrado por quilômetro rodado é obrigatório");
+    }
+    if (price < 0) {
+      throw new IllegalArgumentException(
+          "Preço cobrado por quilômetro rodado tem que ser maior que zero");
+    }
+  }
+
+  public void validatePriceBase(Double price) {
+    if (price == null) {
+      throw new IllegalArgumentException("Preço base por viagem é obrigatório");
+    }
+    if (price < 0) {
+      throw new IllegalArgumentException("Preço base por viagem tem que ser maior que zero");
     }
   }
 }
