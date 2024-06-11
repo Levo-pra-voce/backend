@@ -33,5 +33,6 @@ public class UserDTO {
   private String addressNumber;
   private Double priceBase;
   private Double pricePerKm;
+  private Boolean acceptTerms;
   private byte[] profilePicture;
 }

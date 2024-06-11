@@ -33,7 +33,7 @@ public class DeliveryUserService implements UserManagement {
 
   @Override
   public JwtResponseDTO save(UserDTO userDTO) {
-    userUtils.validateCommonUserFields(userDTO);
+    userUtils.validateNewCommonUser(userDTO);
     userUtils.validateCnh(userDTO.getCnh());
     if (userRepository.existsByEmail(userDTO.getEmail())) {
       throw new IllegalArgumentException("Email já foi cadastrado");
