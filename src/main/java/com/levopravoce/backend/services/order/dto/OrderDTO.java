@@ -2,10 +2,7 @@ package com.levopravoce.backend.services.order.dto;
 
 import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -28,7 +25,11 @@ public class OrderDTO {
     private Double originLongitude;
     private Double destinationLatitude;
     private Double destinationLongitude;
+    @Setter
+    private Long distance;
+    @Setter
+    private Long duration;
 
-//    private VehicleDTO vehicle;
+    //    private VehicleDTO vehicle;
 //    private PaymentDTO payment;
 }

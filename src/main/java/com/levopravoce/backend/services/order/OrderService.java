@@ -5,6 +5,8 @@ import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.repository.OrderRepository;
+import com.levopravoce.backend.services.map.GoogleMapsService;
+import com.levopravoce.backend.services.map.dto.LatLngDTO;
 import com.levopravoce.backend.services.order.mapper.OrderMapper;
 import com.levopravoce.backend.services.order.utils.OrderUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +21,25 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final OrderUtils orderUtils;
+    private final GoogleMapsService googleMapsService;
 
     public OrderDTO createOrder(OrderDTO orderDTO) {
         orderUtils.validateNewOrder(orderDTO);
+
+        var result = googleMapsService.getDistance(LatLngDTO.builder()
+                        .lat(orderDTO.getOriginLatitude())
+                        .lng(orderDTO.getOriginLongitude())
+                        .build(),
+                LatLngDTO.builder()
+                        .lat(orderDTO.getDestinationLatitude())
+                        .lng(orderDTO.getDestinationLongitude())
+                        .build());
+        if(result == null){
+            throw new IllegalArgumentException("Erro ao buscar distância da API do Google Maps.");
+        }
+
+        orderDTO.setDistance(result.getDistanceValueMeters());
+        orderDTO.setDuration(result.getDurationValueSeconds());
 
         User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
         if (!Objects.equals(currentUser.getUserType(), UserType.CLIENTE)) {
@@ -37,5 +55,7 @@ public class OrderService {
         order.setClient(currentUser);
         return orderMapper.toDTO(orderRepository.save(order));
     }
+
+
 
 }

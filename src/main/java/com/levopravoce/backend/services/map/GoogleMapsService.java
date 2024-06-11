@@ -19,26 +19,30 @@ public class GoogleMapsService {
     private String apiKey;
 
     public GoogleDistanceMatrixResponseDTO getDistance(LatLngDTO origin, LatLngDTO destination) {
-        validateLatLng(origin);
-        validateLatLng(destination);
-        var url = BASE_URL + "?origins=" + origin.getLat() + "," + origin.getLng() +
-                "&destinations=" + destination.getLat() + "," + destination.getLng() +
-                "&key=" + apiKey
-                + "&language=pt-BR";
-        GoogleDistanceMatrixResponseApiDTO response = restTemplate.getForObject(url, GoogleDistanceMatrixResponseApiDTO.class);
-        if (response == null) {
-            throw new IllegalArgumentException("Erro ao buscar distância");
+        try{
+            validateLatLng(origin);
+            validateLatLng(destination);
+            var url = BASE_URL + "?origins=" + origin.getLat() + "," + origin.getLng() +
+                    "&destinations=" + destination.getLat() + "," + destination.getLng() +
+                    "&key=" + apiKey
+                    + "&language=pt-BR";
+            GoogleDistanceMatrixResponseApiDTO response = restTemplate.getForObject(url, GoogleDistanceMatrixResponseApiDTO.class);
+            if (response == null) {
+                throw new IllegalArgumentException("Erro ao buscar distância");
+            }
+            GoogleDistanceMatrixRowsDTO firstrow = Optional.ofNullable(response.getRows()).orElse(List.of()).stream().findFirst().orElseThrow();
+            GoogleDistanceMatrixElementDTO firstElement = Optional.ofNullable(firstrow.getElements()).orElse(List.of()).stream().findFirst().orElseThrow();
+            return GoogleDistanceMatrixResponseDTO.builder()
+                    .distanceLabel(firstElement.getDistance().getText())
+                    .distanceValueMeters(firstElement.getDistance().getValue())
+                    .durationLabel(firstElement.getDuration().getText())
+                    .durationValueSeconds(firstElement.getDuration().getValue())
+                    .originAddress(Optional.ofNullable(response.getOriginAddresses()).orElse(List.of()).stream().findFirst().orElse(null))
+                    .originAddress(Optional.ofNullable(response.getDestinationAddresses()).orElse(List.of()).stream().findFirst().orElse(null))
+                    .build();
+        }catch(Exception e){
+            return null;
         }
-        GoogleDistanceMatrixRowsDTO firstrow = Optional.ofNullable(response.getRows()).orElse(List.of()).stream().findFirst().orElseThrow();
-        GoogleDistanceMatrixElementDTO firstElement = Optional.ofNullable(firstrow.getElements()).orElse(List.of()).stream().findFirst().orElseThrow();
-        return GoogleDistanceMatrixResponseDTO.builder()
-                .distanceLabel(firstElement.getDistance().getText())
-                .distanceValueMeters(firstElement.getDistance().getValue())
-                .durationLabel(firstElement.getDuration().getText())
-                .durationValueSeconds(firstElement.getDuration().getValue())
-                .originAddress(Optional.ofNullable(response.getOriginAddresses()).orElse(List.of()).stream().findFirst().orElse(null))
-                .originAddress(Optional.ofNullable(response.getDestinationAddresses()).orElse(List.of()).stream().findFirst().orElse(null))
-                .build();
     }
 
     private void validateLatLng(LatLngDTO latLngDTO) {
