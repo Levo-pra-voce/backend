@@ -2,7 +2,7 @@ logging:
   file:
     name: /tmp/logs/spring-boot-logging.log
   level:
-    root: debug
+    root: trace
 
 spring:
   autoconfigure:

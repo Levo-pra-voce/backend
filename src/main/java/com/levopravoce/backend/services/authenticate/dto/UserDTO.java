@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-
   private Long id;
   private String name;
   private String email;
@@ -33,6 +32,7 @@ public class UserDTO {
   private Vehicle vehicle;
   private String token;
   private String addressNumber;
+  private Boolean acceptTerms;
   private byte[] profilePicture;
 
   public User toEntity() {

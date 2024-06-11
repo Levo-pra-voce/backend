@@ -42,12 +42,19 @@ public class UserUtils {
         .build();
   }
 
-  public void validateCommonUserFields(UserDTO userDTO) {
+  public void validateNewCommonUser(UserDTO userDTO) {
+    validateAcceptTerms(userDTO.getAcceptTerms());
     validateName(userDTO.getName());
     validateEmail(userDTO.getEmail());
     validatePassword(userDTO.getPassword());
     validatePhone(userDTO.getPhone());
     validateCpf(userDTO.getCpf());
+  }
+
+  public void validateAcceptTerms(Boolean acceptTerms) {
+    if (acceptTerms == null || !acceptTerms) {
+      throw new IllegalArgumentException("Termos de uso devem ser aceitos");
+    }
   }
 
   public void validateName(String name) {
