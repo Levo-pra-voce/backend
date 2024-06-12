@@ -26,6 +26,16 @@ public class OrderService {
     public OrderDTO createOrder(OrderDTO orderDTO) {
         orderUtils.validateNewOrder(orderDTO);
 
+        User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
+        if (!Objects.equals(currentUser.getUserType(), UserType.CLIENTE)) {
+            throw new RuntimeException("Apenas clientes podem criar pedidos.");
+        }
+
+        boolean existsByStatusInProgressOrPending = orderRepository.existsByStatusInProgressOrPending(currentUser.getId());
+        if (existsByStatusInProgressOrPending) {
+            throw new RuntimeException("Você já possui um pedido em andamento ou pendente.");
+        }
+
         var result = googleMapsService.getDistance(LatLngDTO.builder()
                         .lat(orderDTO.getOriginLatitude())
                         .lng(orderDTO.getOriginLongitude())
@@ -38,20 +48,15 @@ public class OrderService {
             throw new IllegalArgumentException("Erro ao buscar distância da API do Google Maps.");
         }
 
-        orderDTO.setDistance(result.getDistanceValueMeters());
-        orderDTO.setDuration(result.getDurationValueSeconds());
-
-        User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
-        if (!Objects.equals(currentUser.getUserType(), UserType.CLIENTE)) {
-            throw new RuntimeException("Apenas clientes podem criar pedidos.");
-        }
-
-        boolean existsByStatusInProgressOrPending = orderRepository.existsByStatusInProgressOrPending(currentUser.getId());
-        if (existsByStatusInProgressOrPending) {
-            throw new RuntimeException("Você já possui um pedido em andamento ou pendente.");
+        if (result.getDistanceValueMeters() == null) {
+            throw new IllegalArgumentException("Origem e destino são inválidos.");
         }
 
         Order order = orderMapper.toEntity(orderDTO);
+        order.setDistanceMeters(result.getDistanceValueMeters());
+        order.setDurationSeconds(result.getDurationValueSeconds());
+        order.setDestinationAddress(result.getDestinationAddress());
+        order.setOriginAddress(result.getOriginAddress());
         order.setClient(currentUser);
         return orderMapper.toDTO(orderRepository.save(order));
     }

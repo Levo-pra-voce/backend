@@ -16,7 +16,7 @@ public class OrderDTO {
     private Double width;
     private Double maxWeight;
     private LocalDate deliveryDate;
-    private Boolean haveSecurity;
+    private Boolean haveSecurity = false;
     private Order.OrderStatus status;
     private Double value;
     private UserDTO deliveryman;
@@ -25,11 +25,6 @@ public class OrderDTO {
     private Double originLongitude;
     private Double destinationLatitude;
     private Double destinationLongitude;
-    @Setter
-    private Long distance;
-    @Setter
-    private Long duration;
-
-    //    private VehicleDTO vehicle;
-//    private PaymentDTO payment;
+    private Long distanceMeters;
+    private Long durationSeconds;
 }
