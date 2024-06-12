@@ -5,6 +5,8 @@ import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.repository.OrderRepository;
+import com.levopravoce.backend.services.map.GoogleMapsService;
+import com.levopravoce.backend.services.map.dto.LatLngDTO;
 import com.levopravoce.backend.services.order.mapper.OrderMapper;
 import com.levopravoce.backend.services.order.utils.OrderUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final OrderUtils orderUtils;
+    private final GoogleMapsService googleMapsService;
 
     public OrderDTO createOrder(OrderDTO orderDTO) {
         orderUtils.validateNewOrder(orderDTO);
@@ -33,9 +36,31 @@ public class OrderService {
             throw new RuntimeException("Você já possui um pedido em andamento ou pendente.");
         }
 
+        var result = googleMapsService.getDistance(LatLngDTO.builder()
+                        .lat(orderDTO.getOriginLatitude())
+                        .lng(orderDTO.getOriginLongitude())
+                        .build(),
+                LatLngDTO.builder()
+                        .lat(orderDTO.getDestinationLatitude())
+                        .lng(orderDTO.getDestinationLongitude())
+                        .build());
+        if(result == null){
+            throw new IllegalArgumentException("Erro ao buscar distância da API do Google Maps.");
+        }
+
+        if (result.getDistanceValueMeters() == null) {
+            throw new IllegalArgumentException("Origem e destino são inválidos.");
+        }
+
         Order order = orderMapper.toEntity(orderDTO);
+        order.setDistanceMeters(result.getDistanceValueMeters());
+        order.setDurationSeconds(result.getDurationValueSeconds());
+        order.setDestinationAddress(result.getDestinationAddress());
+        order.setOriginAddress(result.getOriginAddress());
         order.setClient(currentUser);
         return orderMapper.toDTO(orderRepository.save(order));
     }
+
+
 
 }

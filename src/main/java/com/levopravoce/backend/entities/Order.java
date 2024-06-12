@@ -68,6 +68,30 @@ public class Order {
     @JoinColumn(name = "id_pagamento")
     private Payment payment;
 
+    @Column(name = "origem_latitude")
+    private Double originLatitude;
+
+    @Column(name = "origem_longitude")
+    private Double originLongitude;
+
+    @Column(name = "origem_endereco")
+    private String originAddress;
+
+    @Column(name = "destino_latitude")
+    private Double destinationLatitude;
+
+    @Column(name = "destino_longitude")
+    private Double destinationLongitude;
+
+    @Column(name = "destino_endereco")
+    private String destinationAddress;
+
+    @Column(name = "distancia_metros")
+    private Long distanceMeters;
+
+    @Column(name = "duracao_segundos")
+    private Long durationSeconds;
+
     public enum OrderStatus {
         ESPERANDO, EM_PROGRESSO, ENTREGADO, CANCELADO
     }
