@@ -33,6 +33,7 @@ public class InicialDataConfiguration {
           .email("levopravocecliente@gmail.com")
           .password("Teste1234")
           .phone("48973737943")
+          .acceptTerms(true)
           .build();
       UserManagement userManagementClient = userManagementDeciderService.getServiceByType(
           UserType.CLIENTE);
@@ -73,6 +74,7 @@ public class InicialDataConfiguration {
           .addressNumber("123")
           .complement("Apto 101")
           .token("randomGeneratedTokenForAuth")
+          .acceptTerms(true)
           .profilePicture(new byte[]{}) // assume um array de bytes vazio para a foto de perfil
           .vehicle(vehicle)
           .build();
