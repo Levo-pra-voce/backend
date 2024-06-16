@@ -59,4 +59,11 @@ public class SecurityUtils {
     }
     return Optional.empty();
   }
+
+  public static User getCurrentUserThrow() {
+    if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
+      return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+    throw new RuntimeException("User not found");
+  }
 }
