@@ -23,6 +23,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(
             value = """
+              SELECT u FROM Order u
+                WHERE u.deliveryman.id = :deliveryUserId 
+                  AND (u.status = 'ESPERANDO' or u.status = 'EM_PROGRESSO')
+    """)
+    List<Order> findByStatusPendingOrInProgress(
+        Long deliveryUserId
+    );
+
+    @Query(
+            value = """
         SELECT u FROM Order u
         WHERE u.deliveryman.id = :deliveryId
               AND u.status = 'ENTREGADO'
