@@ -15,12 +15,10 @@ public class GoogleMapsService {
     private static final String BASE_URL = "https://maps.googleapis.com/maps/api/distancematrix/json";
     private final RestTemplate restTemplate;
 
-    @Value("${google.map.api.key:invalid_key}")
+    @Value("${google.map.api.key}")
     private String apiKey;
 
     public GoogleDistanceMatrixResponseDTO getDistance(LatLngDTO origin, LatLngDTO destination) {
-        validateLatLng(origin);
-        validateLatLng(destination);
         var url = BASE_URL + "?origins=" + origin.getLat() + "," + origin.getLng() +
                 "&destinations=" + destination.getLat() + "," + destination.getLng() +
                 "&key=" + apiKey
@@ -32,22 +30,12 @@ public class GoogleMapsService {
         GoogleDistanceMatrixRowsDTO firstrow = Optional.ofNullable(response.getRows()).orElse(List.of()).stream().findFirst().orElseThrow();
         GoogleDistanceMatrixElementDTO firstElement = Optional.ofNullable(firstrow.getElements()).orElse(List.of()).stream().findFirst().orElseThrow();
         return GoogleDistanceMatrixResponseDTO.builder()
-                .distanceLabel(firstElement.getDistance().getText())
-                .distanceValueMeters(firstElement.getDistance().getValue())
-                .durationLabel(firstElement.getDuration().getText())
-                .durationValueSeconds(firstElement.getDuration().getValue())
+                .distanceLabel(Optional.ofNullable(firstElement.getDistance()).orElse(new GoogleDistanceMatrixValueDTO()).getText())
+                .distanceValueMeters(Optional.ofNullable(firstElement.getDistance()).orElse(new GoogleDistanceMatrixValueDTO()).getValue())
+                .durationLabel(Optional.ofNullable(firstElement.getDuration()).orElse(new GoogleDistanceMatrixValueDTO()).getText())
+                .durationValueSeconds(Optional.ofNullable(firstElement.getDuration()).orElse(new GoogleDistanceMatrixValueDTO()).getValue())
                 .originAddress(Optional.ofNullable(response.getOriginAddresses()).orElse(List.of()).stream().findFirst().orElse(null))
-                .originAddress(Optional.ofNullable(response.getDestinationAddresses()).orElse(List.of()).stream().findFirst().orElse(null))
+                .destinationAddress(Optional.ofNullable(response.getDestinationAddresses()).orElse(List.of()).stream().findFirst().orElse(null))
                 .build();
-    }
-
-    private void validateLatLng(LatLngDTO latLngDTO) {
-        if (latLngDTO == null) {
-            throw new IllegalArgumentException("Latitude e longitude são obrigatórios");
-        }
-
-        if (latLngDTO.getLat() == null || latLngDTO.getLng() == null) {
-            throw new IllegalArgumentException("Latitude e longitude são obrigatórios");
-        }
     }
 }
