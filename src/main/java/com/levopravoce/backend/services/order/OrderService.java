@@ -11,7 +11,9 @@ import com.levopravoce.backend.services.order.utils.OrderUtils;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +60,14 @@ public class OrderService {
     if (!currentUser.getId().equals(order.getDeliveryman().getId())) {
       throw new RuntimeException("Você não tem permissão para visualizar este pedido.");
     }
+
+    return orderMapper.toDTO(order);
+  }
+
+  public OrderDTO getLatestOrderInProgress(User currentUser) {
+    Order order = orderRepository.findFirstByOrderInProgress(currentUser.getId())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404),
+            "Nenhum pedido em andamento."));
 
     return orderMapper.toDTO(order);
   }

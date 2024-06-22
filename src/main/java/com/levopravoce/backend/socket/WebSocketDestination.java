@@ -6,8 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum WebSocketDestination {
-  CHAT("/chat"),
-  NOTIFICATION("/notification");
+  ORDER_MAP("/order-map");
 
   private final String value;
 }
