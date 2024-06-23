@@ -1,7 +1,6 @@
 package com.levopravoce.backend.repository;
 
 import com.levopravoce.backend.entities.Order;
-import com.levopravoce.backend.entities.Order.OrderStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
   @Query(
       value = """
                     SELECT u FROM Order u
-                      WHERE u.deliveryman.id = :deliveryUserId 
+                      WHERE u.deliveryman.id = :deliveryUserId
                         AND (u.status = 'ESPERANDO' or u.status = 'EM_PROGRESSO')
           """)
   List<Order> findByStatusPendingOrInProgress(
@@ -75,8 +74,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
   @Query(
       value = """
-              SELECT u FROM Order u 
-                WHERE u.client.id = :clientId AND u.status = 'EM_PROGRESSO'
+              SELECT u FROM Order u
+                WHERE (u.deliveryman.id = :userId or u.client.id = :userId)
+                      AND (u.status = 'EM_PROGRESSO' or u.status = 'ENTREGADO')
           """)
-  Optional<Order> findFirstByOrderInProgress(Long clientId);
+  Optional<Order> findLastOrderInProgress(Long userId);
 }

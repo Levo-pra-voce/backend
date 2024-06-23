@@ -5,12 +5,15 @@ import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.repository.OrderRepository;
 import com.levopravoce.backend.services.order.dto.OrderTrackingDTO;
+import com.levopravoce.backend.services.order.dto.OrderTrackingStatus;
 import com.levopravoce.backend.socket.WebSocketDestination;
 import com.levopravoce.backend.socket.WebSocketHandler;
 import com.levopravoce.backend.socket.WebSocketMessageService;
 import com.levopravoce.backend.socket.dto.MessageSocketDTO;
 import com.levopravoce.backend.socket.dto.MessageType;
 import com.levopravoce.backend.socket.dto.WebSocketEventDTO;
+import com.mapbox.geojson.Point;
+import com.mapbox.turf.TurfMeasurement;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -32,24 +35,49 @@ public class OrderSocketService implements WebSocketMessageService<OrderTracking
     if (orderOptional.isEmpty()) {
       return;
     }
+    
     Order order = orderOptional.get();
-    List<WebSocketSession> websockets = webSocketHandler.userToActiveSessions.get(
-        order.getDeliveryman().getId());
-    if (websockets == null) {
+    List<WebSocketSession> clientWebSockets = webSocketHandler.userToActiveSessions.get(order.getClient().getId());
+    if (clientWebSockets == null) {
       return;
     }
     try {
+      Point destinyPoint = Point.fromLngLat(order.getDestinationLongitude(), order.getDestinationLatitude());
+      Point trackingPoint = Point.fromLngLat(orderTrackingDTO.getLongitude(), orderTrackingDTO.getLatitude());
+      double distance = TurfMeasurement.distance(destinyPoint, trackingPoint, "metres");
+      if (distance < 100) {
+        orderTrackingDTO.setStatus(OrderTrackingStatus.ITS_CLOSE);
+        List<WebSocketSession> delivererWebSockets = webSocketHandler.userToActiveSessions.get(order.getDeliveryman().getId());
+        if (delivererWebSockets != null) {
+          String orderTrackingJson = objectMapper.writeValueAsString(orderTrackingDTO);
+          MessageSocketDTO messageSocketDTO = MessageSocketDTO.builder()
+              .type(MessageType.TEXT)
+              .message(orderTrackingJson)
+              .timestamp(System.currentTimeMillis())
+              .sender(currentSessionUser.getUsername())
+              .receiver(order.getDeliveryman().getUsername())
+              .destination(WebSocketDestination.ORDER_MAP)
+              .build();
+          String messageJson = objectMapper.writeValueAsString(messageSocketDTO);
+          for (WebSocketSession webSocketSession: delivererWebSockets) {
+            TextMessage textMessage = new TextMessage(messageJson);
+            webSocketSession.sendMessage(textMessage);
+          }
+        }
+      }
       String orderTrackingJson = objectMapper.writeValueAsString(orderTrackingDTO);
       MessageSocketDTO messageSocketDTO = MessageSocketDTO.builder()
           .type(MessageType.TEXT)
           .message(orderTrackingJson)
           .timestamp(System.currentTimeMillis())
           .sender(currentSessionUser.getUsername())
-          .receiver(order.getDeliveryman().getUsername())
+          .receiver(order.getClient().getUsername())
+          .destination(WebSocketDestination.ORDER_MAP)
           .build();
       String messageJson = objectMapper.writeValueAsString(messageSocketDTO);
-      for (WebSocketSession webSocketSession: websockets) {
-        webSocketHandler.handleMessage(webSocketSession, new TextMessage(messageJson));
+      for (WebSocketSession webSocketSession: clientWebSockets) {
+        TextMessage textMessage = new TextMessage(messageJson);
+        webSocketSession.sendMessage(textMessage);
       }
     } catch (Exception e) {
       throw new RuntimeException(e);
