@@ -5,6 +5,8 @@ import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.repository.OrderRepository;
+import com.levopravoce.backend.repository.UserRepository;
+import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import com.levopravoce.backend.services.order.mapper.OrderMapper;
 import com.levopravoce.backend.services.order.utils.OrderUtils;
@@ -20,6 +22,7 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final OrderMapper orderMapper;
   private final OrderUtils orderUtils;
+  private final UserRepository userRepository;
 
   public OrderDTO createOrder(OrderDTO orderDTO) {
     orderUtils.validateNewOrder(orderDTO);
@@ -60,5 +63,18 @@ public class OrderService {
     }
 
     return orderMapper.toDTO(order);
+  }
+
+  public List<UserDTO> getAllDeliveryMan() {
+    if(!SecurityUtils.getCurrentUser().isPresent()){
+      throw new RuntimeException("Usuário não autenticado.");
+    }
+    return userRepository.findAll().stream()
+        .filter(user -> Objects.equals(user.getUserType(), UserType.ENTREGADOR))
+        .map(user -> UserDTO.builder()
+            .email(user.getEmail())
+            .name(user.getName())
+            .build())
+        .toList();
   }
 }
