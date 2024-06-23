@@ -73,7 +73,7 @@ public class RelatoryService {
           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
           row.createCell(2).setCellValue(Optional.ofNullable(order.getDeliveryDate())
-              .map(date -> date.toLocalDate().format(formatter))
+              .map(date -> date.format(formatter))
               .orElse(null));
         }
       }
@@ -90,7 +90,7 @@ public class RelatoryService {
         .deliveryDate(Optional.ofNullable(order.getDeliveryDate())
             .map(date -> {
               DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-              return date.toLocalDate().format(formatter);
+              return date.format(formatter);
             })
             .orElse(null))
         .build();
