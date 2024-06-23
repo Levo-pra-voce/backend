@@ -34,7 +34,7 @@ public class OrderResource {
         return this.orderService.getDeliveriesPending(currentUser);
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/id")
     public OrderDTO getOrderById(@PathVariable  Long id) {
         User currentUser = SecurityUtils.getCurrentUserThrow();
         return this.orderService.getOrderById(currentUser, id);
