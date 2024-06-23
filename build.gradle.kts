@@ -77,6 +77,7 @@ dependencies {
     implementation("javax.xml.bind:jaxb-api:2.3.1")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.17.1")
     implementation("javax.persistence:javax.persistence-api:2.2")
+    implementation("com.mapbox.mapboxsdk:mapbox-sdk-turf:5.8.0")
 }
 
 group = "com.levo-pra-voce"
