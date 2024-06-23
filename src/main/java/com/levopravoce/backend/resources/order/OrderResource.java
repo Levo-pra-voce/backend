@@ -2,6 +2,7 @@ package com.levopravoce.backend.resources.order;
 
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.User;
+import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.order.OrderService;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import java.util.List;
@@ -33,9 +34,14 @@ public class OrderResource {
         return this.orderService.getDeliveriesPending(currentUser);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public OrderDTO getOrderById(@PathVariable  Long id) {
         User currentUser = SecurityUtils.getCurrentUserThrow();
         return this.orderService.getOrderById(currentUser, id);
+    }
+
+    @GetMapping("/deliverymans")
+    public List<UserDTO> getDeliverymans() {
+        return this.orderService.getAllDeliveryMan();
     }
 }
