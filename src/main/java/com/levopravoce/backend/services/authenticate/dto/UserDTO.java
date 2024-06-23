@@ -34,5 +34,5 @@ public class UserDTO {
   private Double priceBase;
   private Double pricePerKm;
   private Boolean acceptTerms;
-  private byte[] profilePicture;
+  private Byte[] profilePicture;
 }
