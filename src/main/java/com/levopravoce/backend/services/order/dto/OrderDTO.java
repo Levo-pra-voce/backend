@@ -33,13 +33,16 @@ public class OrderDTO {
   private String destinationAddress;
   private String originAddress;
   private Double price;
+  private String carPlate;
 
   public OrderDTO(Long id, Double height, Double width, Double maxWeight, LocalDate deliveryDate,
       Boolean haveSecurity, OrderStatus status, Double value, UserDTO deliveryman, UserDTO client,
       Double averageRating, Double destinationLatitude, Double destinationLongitude,
       Double originLatitude, Double originLongitude, String destinationAddress,
       String originAddress,
-      Double price) {
+      Double price,
+      String carPlate
+  ) {
     this.id = id;
     this.height = height;
     this.width = width;
@@ -56,6 +59,7 @@ public class OrderDTO {
     this.originLongitude = originLongitude;
     this.destinationAddress = destinationAddress;
     this.originAddress = originAddress;
+    this.carPlate = carPlate;
     this.price = 200.0;
     this.averageRating = 5.0;
   }
