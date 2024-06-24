@@ -12,13 +12,16 @@ import com.levopravoce.backend.repository.OrderRepository;
 import com.levopravoce.backend.services.map.GoogleMapsService;
 import com.levopravoce.backend.services.map.dto.LatLngDTO;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
+import com.levopravoce.backend.services.order.dto.OrderPaymentDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingStatus;
 import com.levopravoce.backend.services.order.mapper.OrderMapper;
 import com.levopravoce.backend.services.order.utils.OrderUtils;
+import com.levopravoce.backend.socket.WebSocketDestination;
 import com.levopravoce.backend.socket.WebSocketHandler;
 import com.levopravoce.backend.socket.dto.MessageSocketDTO;
 import com.levopravoce.backend.socket.dto.MessageType;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -70,7 +73,6 @@ public class OrderService {
     order.setDestinationAddress(result.getDestinationAddress());
     order.setOriginAddress(result.getOriginAddress());
     order.setClient(currentUser);
-    order.setDeliveryDate(orderDTO.getDeliveryDate());
     order.setVehicle(
         currentUser.getVehicles().stream().filter(Vehicle::isActive).findFirst().orElse(null));
     order.setHaveSecurity(Optional.ofNullable(orderDTO.getHaveSecurity()).orElse(false));
@@ -103,6 +105,7 @@ public class OrderService {
 
   public void finishOrder(User currentUser) throws JsonProcessingException {
     Order order = orderRepository.findLastOrderInProgress(currentUser.getId()).orElseThrow();
+    order.setDeliveryDate(LocalDateTime.now());
     order.setStatus(OrderStatus.ENTREGADO);
     orderRepository.save(order);
 
@@ -110,10 +113,8 @@ public class OrderService {
     OrderTrackingDTO orderTrackingDTO = OrderTrackingDTO.builder().orderId(order.getId())
         .status(OrderTrackingStatus.FINISHED).build();
     String orderTrackingJson = objectMapper.writeValueAsString(orderTrackingDTO);
-    MessageSocketDTO messageSocketDTO = MessageSocketDTO.builder().type(MessageType.TEXT)
-        .message(orderTrackingJson).timestamp(System.currentTimeMillis())
-        .sender(order.getDeliveryman().getUsername()).receiver(order.getClient().getUsername())
-        .build();
+    MessageSocketDTO messageSocketDTO = mountMessageSocketDTOByOrder(orderTrackingJson,
+        WebSocketDestination.ORDER_MAP, order);
     String messageJson = objectMapper.writeValueAsString(messageSocketDTO);
     webSocketsSessions.forEach(webSocketSession -> {
       try {
@@ -125,12 +126,42 @@ public class OrderService {
     });
   }
 
-  public void payment(User currentUser) {
-    Order order = orderRepository.findLastOrderInProgress(currentUser.getId()).orElseThrow();
+  public void payment(User currentUser) throws JsonProcessingException {
+    String notPermissionMessage = "Você não tem permissão para realizar o pagamento.";
+    Order order = orderRepository.findLastOrderInProgress(currentUser.getId()).orElseThrow(
+        () -> new RuntimeException(notPermissionMessage)
+    );
+    boolean haveWritePermission = Objects.equals(order.getClient().getId(), currentUser.getId());
+    if (!haveWritePermission) {
+      throw new RuntimeException(notPermissionMessage);
+    }
     order.setStatus(OrderStatus.FEITO_PAGAMENTO);
     orderRepository.save(order);
-
     List<WebSocketSession> webSocketsSessions = getWebSocketsSessionsByOrder(order);
+    OrderPaymentDTO orderPaymentDTO = OrderPaymentDTO.builder().isPaid(true).build();
+    String orderPaymentJson = objectMapper.writeValueAsString(orderPaymentDTO);
+    MessageSocketDTO messageSocketDTO = mountMessageSocketDTOByOrder(orderPaymentJson,
+        WebSocketDestination.ORDER_PAYMENT, order);
+    String messageJson = objectMapper.writeValueAsString(messageSocketDTO);
+    webSocketsSessions.forEach(webSocketSession -> {
+      try {
+        webSocketSession.sendMessage(new TextMessage(messageJson));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
+  }
+
+  private MessageSocketDTO mountMessageSocketDTOByOrder(String json,
+      WebSocketDestination destination, Order order) {
+    return MessageSocketDTO.builder()
+        .type(MessageType.TEXT)
+        .message(json)
+        .destination(destination)
+        .timestamp(System.currentTimeMillis())
+        .sender(order.getDeliveryman().getUsername())
+        .receiver(order.getClient().getUsername())
+        .build();
   }
 
   private List<WebSocketSession> getWebSocketsSessionsByOrder(Order order) {

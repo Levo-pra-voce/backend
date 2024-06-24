@@ -1,6 +1,5 @@
 package com.levopravoce.backend.resources.order;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.User;
@@ -58,8 +57,9 @@ public class OrderResource {
   }
 
   @GetMapping("/payment")
-  public void payment() {
+  public ResponseEntity<Void> payment() throws JsonProcessingException {
     User currentUser = SecurityUtils.getCurrentUserThrow();
     this.orderService.payment(currentUser);
+    return ResponseEntity.noContent().build();
   }
 }
