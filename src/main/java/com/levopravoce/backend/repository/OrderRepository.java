@@ -35,8 +35,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
       value = """
               SELECT u FROM Order u
               WHERE u.deliveryman.id = :deliveryId
-                    AND u.status = 'ENTREGADO'
-                    AND u.payment.status = 'PAGO'
+                    AND u.status = 'FEITO_PAGAMENTO'
           """)
   List<Order> findAllByDeliveryMan(Long deliveryId);
 
@@ -45,8 +44,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
               SELECT u FROM Order u
               WHERE u.deliveryman.id = :deliveryId
                     AND u.deliveryDate BETWEEN :inicialDate AND :finalDate
-                    AND u.status = 'ENTREGADO'
-                    AND u.payment.status = 'PAGO'
+                    AND u.status = 'FEITO_PAGAMENTO'
           """)
   List<Order> findAllByDeliveryManAndDeliveryDate(Long deliveryId, LocalDateTime inicialDate,
       LocalDateTime finalDate);
@@ -56,8 +54,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
               SELECT u FROM Order u
                   WHERE
                       u.deliveryman.id = :deliveryId
-                      AND u.status = 'ENTREGADO'
-                      AND u.payment.status = 'PAGO'
+                      AND u.status = 'FEITO_PAGAMENTO'
           """)
   Page<Order> findAllByDeliveryMan(Long deliveryId, Pageable pageable);
 
@@ -66,8 +63,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                   SELECT u FROM Order u
               WHERE u.deliveryman.id = :deliveryId
                     AND u.deliveryDate BETWEEN :inicialDate AND :finalDate
-                    AND u.status = 'ENTREGADO'
-                    AND u.payment.status = 'PAGO'
+                    AND u.status = 'FEITO_PAGAMENTO'
           """)
   Page<Order> findAllByDeliveryManAndDeliveryDate(Long deliveryId, LocalDateTime inicialDate,
       LocalDateTime finalDate, Pageable pageable);

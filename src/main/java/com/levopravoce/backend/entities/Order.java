@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public class Order {
     private Double maxWeight;
 
     @Column(name = "data_entrega")
-    private LocalDate deliveryDate;
+    private LocalDateTime deliveryDate;
 
     @Column(name = "seguro")
     private Boolean haveSecurity;
@@ -63,10 +63,6 @@ public class Order {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_veiculo")
     private Vehicle vehicle;
-
-    @ManyToOne
-    @JoinColumn(name = "id_pagamento")
-    private Payment payment;
 
     @Column(name = "origem_latitude")
     private Double originLatitude;
