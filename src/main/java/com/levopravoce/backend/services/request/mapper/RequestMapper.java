@@ -8,9 +8,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface RequestMapper {
-    @Mapping(target = "orderId", source = "orderId")
     @Mapping(target = "status", source = "status")
-    @Mapping(target = "deliveryman", source = "deliveryman")
     Request toEntity(RequestDTO requestDTO);
 
     @InheritInverseConfiguration

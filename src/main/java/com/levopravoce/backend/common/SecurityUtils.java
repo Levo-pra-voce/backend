@@ -1,5 +1,6 @@
 package com.levopravoce.backend.common;
 
+import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import java.util.Optional;
@@ -65,5 +66,12 @@ public class SecurityUtils {
       return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
     throw new RuntimeException("User not found");
+  }
+
+  public static Order getCurrentOrder() {
+    if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof Order) {
+      return (Order) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+    throw new RuntimeException("Order not found");
   }
 }
