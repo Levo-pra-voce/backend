@@ -151,3 +151,16 @@ create table pedido
     foreign key (id_cliente) references usuario (id),
     foreign key (id_veiculo) references veiculo (id)
 );
+
+
+drop table if exists solicitacao cascade;
+
+create table solicitacao
+(
+    id                  serial primary key,
+    id_pedido           bigint not null,
+    id_entregador       bigint not null,
+    status              text not null,
+    foreign key (id_pedido) references pedido (id),
+    foreign key (id_entregador) references usuario (id)
+);
