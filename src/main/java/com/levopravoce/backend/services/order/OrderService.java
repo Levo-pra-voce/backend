@@ -11,6 +11,7 @@ import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.repository.OrderRepository;
+import com.levopravoce.backend.repository.RequestRepository;
 import com.levopravoce.backend.repository.UserRepository;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.map.GoogleMapsService;
@@ -19,8 +20,11 @@ import com.levopravoce.backend.services.order.dto.OrderDTO;
 import com.levopravoce.backend.services.order.dto.OrderPaymentDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingStatus;
+import com.levopravoce.backend.services.order.dto.RequestDTO;
 import com.levopravoce.backend.services.order.mapper.OrderMapper;
+import com.levopravoce.backend.services.order.mapper.RequestMapper;
 import com.levopravoce.backend.services.order.utils.OrderUtils;
+import com.levopravoce.backend.services.order.utils.RequestUtils;
 import com.levopravoce.backend.socket.WebSocketDestination;
 import com.levopravoce.backend.socket.WebSocketHandler;
 import com.levopravoce.backend.socket.dto.MessageSocketDTO;
@@ -38,7 +42,6 @@ import org.springframework.web.socket.WebSocketSession;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
-
   private final WebSocketHandler webSocketHandler;
   private final ObjectMapper objectMapper;
   private final GoogleMapsService googleMapsService;
@@ -46,6 +49,9 @@ public class OrderService {
   private final OrderMapper orderMapper;
   private final OrderUtils orderUtils;
   private final UserRepository userRepository;
+  private final RequestMapper requestMapper;
+  private final RequestRepository requestRepository;
+  private final RequestUtils requestUtils;
 
   public OrderDTO createOrder(OrderDTO orderDTO) {
     orderUtils.validateNewOrder(orderDTO);
@@ -227,14 +233,33 @@ public class OrderService {
     orderRepository.save(order);
   }
 
-  public void acceptCurrentOrder(User currentUser) {
-    Order order = orderRepository.findLastOrderInPending(currentUser.getId()).orElseThrow(
-        () -> new RuntimeException("Você não possui uma entrega pendente.")
-    );
-    if (!Objects.equals(currentUser.getId(), order.getDeliveryman().getId())) {
-      throw new RuntimeException("Você não tem permissão para aceitar este pedido.");
-    }
-    order.setStatus(OrderStatus.EM_PROGRESSO);
+  public void rejectRequestOrder(User currentUser, Long orderId) {
+    Request request = requestRepository.findByDeliveryManAndOrder(currentUser.getId(), orderId)
+        .orElseThrow(
+            () -> new RuntimeException("Pedido não encontrado.")
+        );
+    requestUtils.validatePendingStatus(request.getStatus());
+    request.setStatus(RequestStatus.RECUSADO);
+    requestRepository.save(request);
+  }
+
+  public void acceptRequestOrder(User currentUser, Long orderId) {
+    Request request = requestRepository.findByDeliveryManAndOrder(currentUser.getId(), orderId)
+        .orElseThrow(
+            () -> new RuntimeException("Pedido não encontrado.")
+        );
+    requestUtils.validatePendingStatus(request.getStatus());
+    request.setStatus(RequestStatus.ACEITO);
+    requestRepository.save(request);
+
+    Order order = orderRepository.findById(orderId).orElseThrow();
+    order.setStatus(OrderStatus.EM_ANDAMENTO);
+    order.setDeliveryman(currentUser);
     orderRepository.save(order);
+  }
+
+  public List<RequestDTO> getAssignOrders(User currentUser) {
+    List<Request> requests = requestRepository.findAllByDeliveryManAndOrder(currentUser.getId());
+    return requests.stream().map(requestMapper::toDTO).toList();
   }
 }

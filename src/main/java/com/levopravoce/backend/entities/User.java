@@ -83,10 +83,6 @@ public class User implements UserDetails {
   @JoinColumn(name = "id_usuario")
   private List<Address> addresses;
 
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "perfil_usuario", joinColumns = @JoinColumn(name = "id_usuario"), inverseJoinColumns = @JoinColumn(name = "id_perfil"))
-  private List<Profile> profiles;
-
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinColumn(name = "id_usuario")
   private List<Vehicle> vehicles;
@@ -103,10 +99,7 @@ public class User implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return Optional.ofNullable(this.profiles).map(profiles -> profiles.stream().map(
-            profile -> profile.getPermissions().stream().map(Permission::getName)
-                .map(SimpleGrantedAuthority::new).toList()).flatMap(Collection::stream)
-        .collect(Collectors.toSet())).orElse(Collections.emptySet());
+    return List.of(new SimpleGrantedAuthority(this.userType.name()));
   }
 
   @Override

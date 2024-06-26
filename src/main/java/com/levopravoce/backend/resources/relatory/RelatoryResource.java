@@ -1,5 +1,6 @@
 package com.levopravoce.backend.resources.relatory;
 
+import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.services.relatory.RelatoryService;
 import com.levopravoce.backend.services.relatory.dto.RelatoryDTO;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,7 @@ public class RelatoryResource {
   private final RelatoryService relatoryService;
 
   @GetMapping
+  @PreAuthorize("authentication.principal.userType.name() == 'ENTREGADOR'")
   public Page<RelatoryDTO> getOrdersByDeliveryMan(
       LocalDate deliveryDate,
       @PageableDefault(size = 50) Pageable pageable
@@ -30,6 +33,7 @@ public class RelatoryResource {
     return relatoryService.getOrdersByDeliveryMan(deliveryDate, pageable);
   }
 
+  @PreAuthorize("authentication.principal.userType.name() == 'ENTREGADOR'")
   @GetMapping("/xlsx")
   public ResponseEntity<ByteArrayResource> getRelatoryXlsx(
       LocalDate deliveryDate

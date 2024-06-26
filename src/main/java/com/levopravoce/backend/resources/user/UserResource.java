@@ -2,8 +2,8 @@ package com.levopravoce.backend.resources.user;
 
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
-import com.levopravoce.backend.services.user.UserManagementDeciderService;
 import com.levopravoce.backend.services.user.UserForgotPasswordService;
+import com.levopravoce.backend.services.user.UserManagementDeciderService;
 import com.levopravoce.backend.services.user.UserPasswordService;
 import com.levopravoce.backend.services.user.UserSearchService;
 import com.levopravoce.backend.services.user.dto.PasswordCodeDTO;
@@ -34,12 +34,7 @@ public class UserResource {
 
   @GetMapping("/me")
   public UserDTO getUser() {
-    return userSearchService.getUser(SecurityUtils
-        .getCurrentUser()
-        .orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
-        )
-    );
+    return userSearchService.getUser(SecurityUtils.getCurrentUserThrow());
   }
 
   @GetMapping("/all")
@@ -68,7 +63,8 @@ public class UserResource {
 
   @PostMapping("/forgot-password/exist-code")
   public ResponseEntity<Void> existCode(@RequestBody PasswordCodeDTO passwordCodeDTO) {
-    boolean existCode = userForgotPasswordService.existCode(passwordCodeDTO.getEmail(), passwordCodeDTO.getCode());
+    boolean existCode = userForgotPasswordService.existCode(passwordCodeDTO.getEmail(),
+        passwordCodeDTO.getCode());
     if (!existCode) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Código não encontrado");
     }
@@ -83,6 +79,7 @@ public class UserResource {
 
   @PutMapping("/change-password")
   public void changePassword(@RequestBody PasswordCodeDTO passwordCodeDTO) {
-    userPasswordService.changePassword(SecurityUtils.getCurrentUser().orElseThrow(), passwordCodeDTO.getPassword());
+    userPasswordService.changePassword(SecurityUtils.getCurrentUser().orElseThrow(),
+        passwordCodeDTO.getPassword());
   }
 }

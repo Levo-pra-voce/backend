@@ -95,6 +95,6 @@ public class Order {
     private Long durationSeconds;
 
     public enum OrderStatus {
-        CANCELADO, ESPERANDO, EM_PROGRESSO, ENTREGADO, FEITO_PAGAMENTO
+        CANCELADO, ESPERANDO, EM_ANDAMENTO, EM_PROGRESSO, ENTREGADO, FEITO_PAGAMENTO
     }
 }
