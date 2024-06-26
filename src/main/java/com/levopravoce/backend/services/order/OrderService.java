@@ -5,14 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.Order.OrderStatus;
+import com.levopravoce.backend.entities.Request;
+import com.levopravoce.backend.entities.Request.RequestStatus;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.repository.OrderRepository;
-import com.levopravoce.backend.services.map.GoogleMapsService;
-import com.levopravoce.backend.services.map.dto.LatLngDTO;
 import com.levopravoce.backend.repository.UserRepository;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
+import com.levopravoce.backend.services.map.GoogleMapsService;
+import com.levopravoce.backend.services.map.dto.LatLngDTO;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import com.levopravoce.backend.services.order.dto.OrderPaymentDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingDTO;
@@ -79,6 +81,7 @@ public class OrderService {
     order.setVehicle(
         currentUser.getVehicles().stream().filter(Vehicle::isActive).findFirst().orElse(null));
     order.setHaveSecurity(Optional.ofNullable(orderDTO.getHaveSecurity()).orElse(false));
+    order.setStatus(OrderStatus.ESPERANDO);
     return orderMapper.toDTO(orderRepository.save(order));
   }
 
@@ -102,10 +105,8 @@ public class OrderService {
   }
 
   public List<UserDTO> getAllDeliveryMan() {
-    if(!SecurityUtils.getCurrentUser().isPresent()){
-      throw new RuntimeException("Usuário não autenticado.");
-    }
-    return userRepository.findAll().stream()
+    return userRepository.findAll()
+        .stream()
         .filter(user -> Objects.equals(user.getUserType(), UserType.ENTREGADOR))
         .map(User::toDTO)
         .toList();
@@ -186,5 +187,54 @@ public class OrderService {
             webSocketHandler.userToActiveSessions.get(order.getDeliveryman().getId()))
         .orElse(new ArrayList<>()));
     return webSocketsSessions;
+  }
+
+  public void assignDeliveryman(User currentUser, Long deliveryManId) {
+    Order order = orderRepository.findLastOrderInPending(currentUser.getId()).orElseThrow(
+        () -> new RuntimeException("Você não possui uma entrega pendente.")
+    );
+    orderUtils.verifyIfOrderAlreadyHaveDeliveryMan(order, deliveryManId);
+    Optional<User> deliveryManOptional = userRepository.findById(deliveryManId);
+    deliveryManOptional.ifPresentOrElse(
+        deliveryMan -> {
+          Request request = Request
+              .builder()
+              .deliveryman(deliveryMan)
+              .order(order)
+              .status(RequestStatus.SOLICITADO)
+              .build();
+          order.getRequests().add(request);
+          orderRepository.save(order);
+        },
+        () -> {
+          throw new RuntimeException("Entregador não encontrado.");
+        }
+    );
+  }
+
+  public void cancelOrder(User currentUser, Long orderId) {
+    Order order = orderRepository.findById(orderId).orElseThrow(
+        () -> new RuntimeException("Entrega não encontrada.")
+    );
+    if (!Objects.equals(order.getClient().getId(), currentUser.getId())) {
+      throw new RuntimeException("Você não tem permissão para cancelar este pedido.");
+    }
+    if (order.getStatus() == OrderStatus.ENTREGADO) {
+      throw new RuntimeException("Pedido já foi entregue.");
+    }
+
+    order.setStatus(OrderStatus.CANCELADO);
+    orderRepository.save(order);
+  }
+
+  public void acceptCurrentOrder(User currentUser) {
+    Order order = orderRepository.findLastOrderInPending(currentUser.getId()).orElseThrow(
+        () -> new RuntimeException("Você não possui uma entrega pendente.")
+    );
+    if (!Objects.equals(currentUser.getId(), order.getDeliveryman().getId())) {
+      throw new RuntimeException("Você não tem permissão para aceitar este pedido.");
+    }
+    order.setStatus(OrderStatus.EM_PROGRESSO);
+    orderRepository.save(order);
   }
 }

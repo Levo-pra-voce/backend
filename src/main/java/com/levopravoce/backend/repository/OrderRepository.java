@@ -75,4 +75,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                       AND (u.status = 'EM_PROGRESSO' or u.status = 'ENTREGADO')
           """)
   Optional<Order> findLastOrderInProgress(Long userId);
+
+  @Query(
+      value = """
+              SELECT u FROM Order u
+                WHERE (u.deliveryman.id = :userId or u.client.id = :userId)
+                      AND u.status = 'ESPERANDO'
+          """)
+  Optional<Order> findLastOrderInPending(Long userId);
 }

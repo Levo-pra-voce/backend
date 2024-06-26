@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,10 +45,10 @@ public class OrderResource {
     return this.orderService.getOrderById(currentUser, id);
   }
 
-    @GetMapping("/deliverymans")
-    public List<UserDTO> getDeliverymans() {
-        return this.orderService.getAllDeliveryMan();
-    }
+  @GetMapping("/deliverymans")
+  public List<UserDTO> getDeliverymans() {
+    return this.orderService.getAllDeliveryMan();
+  }
 
   @GetMapping("/last-progress")
   public ResponseEntity<OrderDTO> getLastProgress() {
@@ -60,6 +61,29 @@ public class OrderResource {
   public void finishOrder() throws JsonProcessingException {
     User currentUser = SecurityUtils.getCurrentUserThrow();
     this.orderService.finishOrder(currentUser);
+  }
+
+  @PostMapping("/assign-deliveryman/{id}")
+  public ResponseEntity<Void> assignDeliveryman(
+      @PathVariable("id") Long deliveryManId
+  ) {
+    User currentUser = SecurityUtils.getCurrentUserThrow();
+    this.orderService.assignDeliveryman(currentUser, deliveryManId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/accept/{id}")
+  public ResponseEntity<Void> acceptOrder() {
+    User currentUser = SecurityUtils.getCurrentUserThrow();
+    this.orderService.acceptCurrentOrder(currentUser);
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> cancelOrder(@PathVariable Long id) {
+    User currentUser = SecurityUtils.getCurrentUserThrow();
+    this.orderService.cancelOrder(currentUser, id);
+    return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/payment")

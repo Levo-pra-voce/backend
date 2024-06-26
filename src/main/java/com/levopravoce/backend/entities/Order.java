@@ -10,8 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -63,6 +65,10 @@ public class Order {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_veiculo")
     private Vehicle vehicle;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_pedido")
+    private List<Request> requests;
 
     @Column(name = "origem_latitude")
     private Double originLatitude;
