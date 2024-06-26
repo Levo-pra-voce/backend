@@ -52,7 +52,7 @@ public class Order {
     @Column(name = "valor")
     private Double value;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_entregador")
     private User deliveryman;
 
@@ -60,13 +60,9 @@ public class Order {
     @JoinColumn(name = "id_cliente")
     private User client;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_veiculo")
     private Vehicle vehicle;
-
-    @ManyToOne
-    @JoinColumn(name = "id_pagamento")
-    private Payment payment;
 
     @Column(name = "origem_latitude")
     private Double originLatitude;
@@ -93,6 +89,6 @@ public class Order {
     private Long durationSeconds;
 
     public enum OrderStatus {
-        ESPERANDO, EM_PROGRESSO, ENTREGADO, CANCELADO
+        CANCELADO, ESPERANDO, EM_PROGRESSO, ENTREGADO, FEITO_PAGAMENTO
     }
 }

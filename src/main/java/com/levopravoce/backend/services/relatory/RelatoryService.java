@@ -2,6 +2,7 @@ package com.levopravoce.backend.services.relatory;
 
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.Order;
+import com.levopravoce.backend.entities.Order.OrderStatus;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.repository.OrderRepository;
 import com.levopravoce.backend.services.relatory.dto.RelatoryDTO;
@@ -65,15 +66,18 @@ public class RelatoryService {
           headerRow.createCell(0).setCellValue("Nome do cliente");
           headerRow.createCell(1).setCellValue("Valor");
           headerRow.createCell(2).setCellValue("Data da entrega");
+          headerRow.createCell(3).setCellValue("Pagamento realizado");
         } else {
           Order order = orders.get(i - 1);
           Row row = sheet.createRow(rowNumber++);
           row.createCell(0).setCellValue(order.getClient().getName());
           row.createCell(1).setCellValue(order.getValue());
           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
           row.createCell(2).setCellValue(Optional.ofNullable(order.getDeliveryDate())
-              .map(date -> date.toLocalDate().format(formatter))
+              .map(date -> date.format(formatter))
+              .orElse(null));
+          row.createCell(3).setCellValue(Optional.ofNullable(order.getStatus())
+              .map(status -> OrderStatus.FEITO_PAGAMENTO.equals(status) ? "Sim" : "Não")
               .orElse(null));
         }
       }
@@ -90,7 +94,7 @@ public class RelatoryService {
         .deliveryDate(Optional.ofNullable(order.getDeliveryDate())
             .map(date -> {
               DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-              return date.toLocalDate().format(formatter);
+              return date.format(formatter);
             })
             .orElse(null))
         .build();

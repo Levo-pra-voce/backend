@@ -124,22 +124,6 @@ create table avaliacao (
                            foreign key (id_veiculo) references veiculo (id)
 );
 
-drop table if exists pagamento cascade;
-
-create table pagamento (
-                           id           serial primary key,
-                           id_cliente   bigint,
-                           id_entregador bigint,
-                           id_veiculo   bigint,
-                           valor        numeric(10, 2),
-                           data_criacao timestamp default now(),
-                           ativo        boolean,
-                           status       text,
-                           foreign key (id_cliente) references usuario (id),
-                           foreign key (id_veiculo) references veiculo (id),
-                           foreign key (id_entregador) references usuario (id)
-);
-
 drop table if exists pedido cascade;
 
 create table pedido
@@ -148,8 +132,7 @@ create table pedido
     id_entregador       bigint,
     id_cliente          bigint NOT NULL,
     id_veiculo          bigint,
-    id_pagamento        bigint,
-    data_entrega        timestamp default now(),
+    data_entrega        timestamp,
     altura              DOUBLE PRECISION NOT NULL ,
     largura             DOUBLE PRECISION NOT NULL ,
     peso_maximo         DOUBLE PRECISION NOT NULL,
@@ -166,6 +149,5 @@ create table pedido
     duracao_segundos    integer,
     foreign key (id_entregador) references usuario (id),
     foreign key (id_cliente) references usuario (id),
-    foreign key (id_veiculo) references veiculo (id),
-    foreign key (id_pagamento) references pagamento (id)
+    foreign key (id_veiculo) references veiculo (id)
 );

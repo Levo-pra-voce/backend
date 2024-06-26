@@ -4,8 +4,10 @@ import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
 import java.util.Optional;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.server.ResponseStatusException;
 
 public class SecurityUtils {
 
@@ -65,7 +67,7 @@ public class SecurityUtils {
     if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
       return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-    throw new RuntimeException("User not found");
+    throw new ResponseStatusException(HttpStatusCode.valueOf(401), "Usuário não autenticado.");
   }
 
   public static Order getCurrentOrder() {

@@ -1,21 +1,38 @@
 package com.levopravoce.backend.services.order.mapper;
 
 import com.levopravoce.backend.entities.Order;
+import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
-import org.mapstruct.InheritInverseConfiguration;
+import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
-    @Mapping(target = "height", source = "height")
-    @Mapping(target = "width", source = "width")
-    @Mapping(target = "maxWeight", source = "maxWeight")
-    @Mapping(target = "haveSecurity", source = "haveSecurity")
-    @Mapping(target = "status", source = "status")
-    @Mapping(target = "destinationAddress", source = "destinationAddress")
-    @Mapping(target = "originAddress", source = "originAddress")
-    Order toEntity(OrderDTO orderDTO);
-    @InheritInverseConfiguration
-    OrderDTO toDTO(Order order);
+
+  @Mapping(target = "height", source = "height")
+  @Mapping(target = "width", source = "width")
+  @Mapping(target = "maxWeight", source = "maxWeight")
+  @Mapping(target = "haveSecurity", source = "haveSecurity")
+  @Mapping(target = "status", source = "status")
+  @Mapping(target = "destinationAddress", source = "destinationAddress")
+  @Mapping(target = "originAddress", source = "originAddress")
+  Order toEntity(OrderDTO orderDTO);
+
+  @Mapping(target = "height", source = "height")
+  @Mapping(target = "width", source = "width")
+  @Mapping(target = "maxWeight", source = "maxWeight")
+  @Mapping(target = "haveSecurity", source = "haveSecurity")
+  @Mapping(target = "status", source = "status")
+  @Mapping(target = "destinationAddress", source = "destinationAddress")
+  @Mapping(target = "originAddress", source = "originAddress")
+  @Mapping(source = "order", target = "carPlate", qualifiedByName = "setCarPlate")
+  OrderDTO toDTO(Order order);
+
+  @Named("setCarPlate")
+  default String setCarPlate(Order order) {
+    return Optional.ofNullable(order.getVehicle())
+        .map(Vehicle::getPlate).orElse(null);
+  }
 }

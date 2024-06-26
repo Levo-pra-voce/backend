@@ -38,8 +38,11 @@ public class OrderUtils {
     }
 
     public void validateDeliveryDate(LocalDate deliveryDate) {
-        if (deliveryDate == null || deliveryDate.isBefore(LocalDate.now())) {
+        if (deliveryDate == null) {
             throw new IllegalArgumentException("Data de entrega inválida");
+        }
+        if (deliveryDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Data de entrega não pode ser anterior a data atual");
         }
     }
 

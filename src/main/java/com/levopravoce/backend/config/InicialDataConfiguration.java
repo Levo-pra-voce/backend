@@ -75,7 +75,7 @@ public class InicialDataConfiguration {
           .complement("Apto 101")
           .token("randomGeneratedTokenForAuth")
           .acceptTerms(true)
-          .profilePicture(new byte[]{}) // assume um array de bytes vazio para a foto de perfil
+          .profilePicture(new Byte[]{}) // assume um array de bytes vazio para a foto de perfil
           .vehicle(vehicle)
           .build();
 

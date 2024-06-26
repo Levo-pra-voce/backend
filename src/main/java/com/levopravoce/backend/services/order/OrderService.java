@@ -1,24 +1,45 @@
 package com.levopravoce.backend.services.order;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.Order;
+import com.levopravoce.backend.entities.Order.OrderStatus;
 import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.entities.UserType;
+import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.repository.OrderRepository;
+import com.levopravoce.backend.services.map.GoogleMapsService;
+import com.levopravoce.backend.services.map.dto.LatLngDTO;
 import com.levopravoce.backend.repository.UserRepository;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
+import com.levopravoce.backend.services.order.dto.OrderPaymentDTO;
+import com.levopravoce.backend.services.order.dto.OrderTrackingDTO;
+import com.levopravoce.backend.services.order.dto.OrderTrackingStatus;
 import com.levopravoce.backend.services.order.mapper.OrderMapper;
 import com.levopravoce.backend.services.order.utils.OrderUtils;
+import com.levopravoce.backend.socket.WebSocketDestination;
+import com.levopravoce.backend.socket.WebSocketHandler;
+import com.levopravoce.backend.socket.dto.MessageSocketDTO;
+import com.levopravoce.backend.socket.dto.MessageType;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
+  private final WebSocketHandler webSocketHandler;
+  private final ObjectMapper objectMapper;
+  private final GoogleMapsService googleMapsService;
   private final OrderRepository orderRepository;
   private final OrderMapper orderMapper;
   private final OrderUtils orderUtils;
@@ -38,21 +59,36 @@ public class OrderService {
       throw new RuntimeException("Você já possui um pedido em andamento ou pendente.");
     }
 
+    var result = googleMapsService.getDistance(
+        LatLngDTO.builder().lat(orderDTO.getOriginLatitude()).lng(orderDTO.getOriginLongitude())
+            .build(), LatLngDTO.builder().lat(orderDTO.getDestinationLatitude())
+            .lng(orderDTO.getDestinationLongitude()).build());
+    if (result == null) {
+      throw new IllegalArgumentException("Erro ao buscar distância da API do Google Maps.");
+    }
+    if (result.getDistanceValueMeters() == null) {
+      throw new IllegalArgumentException("Origem e destino são inválidos.");
+    }
+
     Order order = orderMapper.toEntity(orderDTO);
+    order.setDistanceMeters(result.getDistanceValueMeters());
+    order.setDurationSeconds(result.getDurationValueSeconds());
+    order.setDestinationAddress(result.getDestinationAddress());
+    order.setOriginAddress(result.getOriginAddress());
     order.setClient(currentUser);
+    order.setVehicle(
+        currentUser.getVehicles().stream().filter(Vehicle::isActive).findFirst().orElse(null));
+    order.setHaveSecurity(Optional.ofNullable(orderDTO.getHaveSecurity()).orElse(false));
     return orderMapper.toDTO(orderRepository.save(order));
   }
 
-  public List<OrderDTO> getDeliveriesPending(
-      User currentUser
-  ) {
+  public List<OrderDTO> getDeliveriesPending(User currentUser) {
     if (!Objects.equals(currentUser.getUserType(), UserType.ENTREGADOR)) {
       throw new RuntimeException("Apenas entregadores podem visualizar pedidos pendentes.");
     }
 
     List<Order> orders = orderRepository.findByStatusPendingOrInProgress(currentUser.getId());
-    List<OrderDTO> orderDTOS = orders.stream().map(orderMapper::toDTO).toList();
-    return orderDTOS;
+    return orders.stream().map(orderMapper::toDTO).toList();
   }
 
   public OrderDTO getOrderById(User currentUser, Long id) {
@@ -71,10 +107,84 @@ public class OrderService {
     }
     return userRepository.findAll().stream()
         .filter(user -> Objects.equals(user.getUserType(), UserType.ENTREGADOR))
-        .map(user -> UserDTO.builder()
-            .email(user.getEmail())
-            .name(user.getName())
-            .build())
+        .map(User::toDTO)
         .toList();
+  }
+
+  public Optional<OrderDTO> getLatestOrderInProgress(User currentUser) {
+    Optional<Order> order = orderRepository.findLastOrderInProgress(currentUser.getId());
+    return order.map(orderMapper::toDTO);
+  }
+
+  public void finishOrder(User currentUser) throws JsonProcessingException {
+    Order order = orderRepository.findLastOrderInProgress(currentUser.getId()).orElseThrow();
+    order.setDeliveryDate(LocalDateTime.now());
+    order.setStatus(OrderStatus.ENTREGADO);
+    orderRepository.save(order);
+
+    List<WebSocketSession> webSocketsSessions = getWebSocketsSessionsByOrder(order);
+    OrderTrackingDTO orderTrackingDTO = OrderTrackingDTO.builder().orderId(order.getId())
+        .status(OrderTrackingStatus.FINISHED).build();
+    String orderTrackingJson = objectMapper.writeValueAsString(orderTrackingDTO);
+    MessageSocketDTO messageSocketDTO = mountMessageSocketDTOByOrder(orderTrackingJson,
+        WebSocketDestination.ORDER_MAP, order);
+    String messageJson = objectMapper.writeValueAsString(messageSocketDTO);
+    webSocketsSessions.forEach(webSocketSession -> {
+      try {
+        TextMessage textMessage = new TextMessage(messageJson);
+        webSocketSession.sendMessage(textMessage);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
+  }
+
+  public void payment(User currentUser) throws JsonProcessingException {
+    String notPermissionMessage = "Você não tem permissão para realizar o pagamento.";
+    Order order = orderRepository.findLastOrderInProgress(currentUser.getId()).orElseThrow(
+        () -> new RuntimeException(notPermissionMessage)
+    );
+    boolean haveWritePermission = Objects.equals(order.getClient().getId(), currentUser.getId());
+    if (!haveWritePermission) {
+      throw new RuntimeException(notPermissionMessage);
+    }
+    order.setStatus(OrderStatus.FEITO_PAGAMENTO);
+    orderRepository.save(order);
+    List<WebSocketSession> webSocketsSessions = getWebSocketsSessionsByOrder(order);
+    OrderPaymentDTO orderPaymentDTO = OrderPaymentDTO.builder().isPaid(true).build();
+    String orderPaymentJson = objectMapper.writeValueAsString(orderPaymentDTO);
+    MessageSocketDTO messageSocketDTO = mountMessageSocketDTOByOrder(orderPaymentJson,
+        WebSocketDestination.ORDER_PAYMENT, order);
+    String messageJson = objectMapper.writeValueAsString(messageSocketDTO);
+    webSocketsSessions.forEach(webSocketSession -> {
+      try {
+        webSocketSession.sendMessage(new TextMessage(messageJson));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
+  }
+
+  private MessageSocketDTO mountMessageSocketDTOByOrder(String json,
+      WebSocketDestination destination, Order order) {
+    return MessageSocketDTO.builder()
+        .type(MessageType.TEXT)
+        .message(json)
+        .destination(destination)
+        .timestamp(System.currentTimeMillis())
+        .sender(order.getDeliveryman().getUsername())
+        .receiver(order.getClient().getUsername())
+        .build();
+  }
+
+  private List<WebSocketSession> getWebSocketsSessionsByOrder(Order order) {
+    List<WebSocketSession> webSocketsSessions = new ArrayList<>();
+    webSocketsSessions.addAll(Optional.ofNullable(
+            webSocketHandler.userToActiveSessions.get(order.getClient().getId()))
+        .orElse(new ArrayList<>()));
+    webSocketsSessions.addAll(Optional.ofNullable(
+            webSocketHandler.userToActiveSessions.get(order.getDeliveryman().getId()))
+        .orElse(new ArrayList<>()));
+    return webSocketsSessions;
   }
 }
