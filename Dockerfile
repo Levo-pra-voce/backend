@@ -1,25 +1,12 @@
-FROM ghcr.io/graalvm/native-image:ol8-java17-22 AS builder
+FROM openjdk:17-jdk-alpine
+COPY . /src
+COPY gradlew /src
+WORKDIR /src
+RUN ./gradlew build -x test
 
-# Install tar and gzip to extract the Maven binaries
-RUN microdnf update \
- && microdnf install --nodocs \
-    tar \
-    gzip \
- && microdnf clean all \
- && rm -rf /var/cache/yum
-
-WORKDIR /app
-COPY . .
-# Cache Gradle and dependencies
-RUN ./gradlew clean --no-daemon
-# Compile native executable
-RUN ./gradlew nativeCompile --no-daemon
-
-# Create run image from scratch
-FROM debian:12.0-slim
-
-WORKDIR /app
-# Copy the native executable
-COPY --from=builder /app/build/native/nativeCompile/levo-pra-voce /app/levo-pra-voce
-# Run the native executable
-#CMD ["/app/levo-pra-voce"]
+FROM openjdk:17-jdk-alpine
+COPY --from=0 /src/build/libs/levo-pra-voce-0.0.1-SNAPSHOT.jar /app.jar
+EXPOSE 8080
+ARG JAR_FILE=build/libs/*.jar
+ADD ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
