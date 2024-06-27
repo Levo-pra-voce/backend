@@ -97,7 +97,6 @@ tasks.named<Test>("test") {
 }
 
 java {
-    withSourcesJar()
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
@@ -109,6 +108,10 @@ tasks.jar {
                 "Main-Class" to "com.levopravoce.backend.BackendApplication",
         )
     }
+}
+
+tasks.getByName<Jar>("jar") {
+    enabled = false
 }
 
 //graalvmNative {
