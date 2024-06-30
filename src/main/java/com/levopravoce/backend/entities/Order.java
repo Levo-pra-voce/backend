@@ -1,5 +1,6 @@
 package com.levopravoce.backend.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -66,7 +67,7 @@ public class Order {
     @JoinColumn(name = "id_veiculo")
     private Vehicle vehicle;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_pedido")
     private List<Request> requests;
 
@@ -95,6 +96,6 @@ public class Order {
     private Long durationSeconds;
 
     public enum OrderStatus {
-        CANCELADO, ESPERANDO, EM_ANDAMENTO, EM_PROGRESSO, ENTREGADO, FEITO_PAGAMENTO
+        CANCELADO, ESPERANDO, ACEITO, EM_PROGRESSO, ENTREGADO, FEITO_PAGAMENTO
     }
 }

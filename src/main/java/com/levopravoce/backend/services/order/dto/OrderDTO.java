@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class OrderDTO {
-
   private Long id;
   private Double height;
   private Double width;
@@ -60,7 +59,7 @@ public class OrderDTO {
     this.destinationAddress = destinationAddress;
     this.originAddress = originAddress;
     this.carPlate = carPlate;
-    this.price = 200.0;
+    this.price = haveSecurity ? 220.0 : 200.0;
     this.averageRating = 5.0;
   }
 //    private VehicleDTO vehicle;

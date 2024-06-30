@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class UserDTO {
   private Long id;
   private String name;
@@ -35,4 +34,36 @@ public class UserDTO {
   private Double pricePerKm;
   private Boolean acceptTerms;
   private Byte[] profilePicture;
+  private Double averageRating;
+
+  public UserDTO(Long id, String name, String email, String password, String phone, String cpf,
+      String cnh, String city, String state, String zipCode, String country, String status,
+      String complement, String neighborhood, String street, UserType userType, Vehicle vehicle,
+      String token, String addressNumber, Double priceBase, Double pricePerKm, Boolean acceptTerms,
+      Byte[] profilePicture, Double averageRating) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.password = password;
+    this.phone = phone;
+    this.cpf = cpf;
+    this.cnh = cnh;
+    this.city = city;
+    this.state = state;
+    this.zipCode = zipCode;
+    this.country = country;
+    this.status = status;
+    this.complement = complement;
+    this.neighborhood = neighborhood;
+    this.street = street;
+    this.userType = userType;
+    this.vehicle = vehicle;
+    this.token = token;
+    this.addressNumber = addressNumber;
+    this.priceBase = priceBase;
+    this.pricePerKm = pricePerKm;
+    this.acceptTerms = acceptTerms;
+    this.profilePicture = profilePicture;
+    this.averageRating = 5.0;
+  }
 }

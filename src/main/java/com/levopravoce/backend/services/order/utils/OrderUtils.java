@@ -76,7 +76,7 @@ public class OrderUtils {
   public void verifyIfOrderAlreadyHaveDeliveryMan(Order order, Long deliveryManId) {
     Optional.ofNullable(order.getRequests()).orElse(List.of()).forEach(request -> {
       if (Objects.equals(request.getDeliveryman().getId(), deliveryManId)) {
-        throw new RuntimeException("Entregador já atribuído ao pedido.");
+        throw new IllegalArgumentException("Entregador já atribuído ao pedido.");
       }
     });
   }

@@ -13,13 +13,13 @@ import com.levopravoce.backend.entities.Vehicle;
 import com.levopravoce.backend.repository.OrderRepository;
 import com.levopravoce.backend.repository.RequestRepository;
 import com.levopravoce.backend.repository.UserRepository;
-import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.map.GoogleMapsService;
 import com.levopravoce.backend.services.map.dto.LatLngDTO;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import com.levopravoce.backend.services.order.dto.OrderPaymentDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingStatus;
+import com.levopravoce.backend.services.order.dto.RecommendUserDTO;
 import com.levopravoce.backend.services.order.dto.RequestDTO;
 import com.levopravoce.backend.services.order.mapper.OrderMapper;
 import com.levopravoce.backend.services.order.mapper.RequestMapper;
@@ -42,6 +42,7 @@ import org.springframework.web.socket.WebSocketSession;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
+
   private final WebSocketHandler webSocketHandler;
   private final ObjectMapper objectMapper;
   private final GoogleMapsService googleMapsService;
@@ -92,10 +93,6 @@ public class OrderService {
   }
 
   public List<OrderDTO> getDeliveriesPending(User currentUser) {
-    if (!Objects.equals(currentUser.getUserType(), UserType.ENTREGADOR)) {
-      throw new RuntimeException("Apenas entregadores podem visualizar pedidos pendentes.");
-    }
-
     List<Order> orders = orderRepository.findByStatusPendingOrInProgress(currentUser.getId());
     return orders.stream().map(orderMapper::toDTO).toList();
   }
@@ -110,16 +107,28 @@ public class OrderService {
     return orderMapper.toDTO(order);
   }
 
-  public List<UserDTO> getAllDeliveryMan() {
+  public List<RecommendUserDTO> getAllDeliveryManToOrder() {
     return userRepository.findAll()
         .stream()
         .filter(user -> Objects.equals(user.getUserType(), UserType.ENTREGADOR))
-        .map(User::toDTO)
+        .map(user ->
+            RecommendUserDTO
+                .builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .phone(user.getContact())
+                .build()
+        )
         .toList();
   }
 
   public Optional<OrderDTO> getLatestOrderInProgress(User currentUser) {
     Optional<Order> order = orderRepository.findLastOrderInProgress(currentUser.getId());
+    return order.map(orderMapper::toDTO);
+  }
+
+  public Optional<OrderDTO> getLatestOrderInPending(User currentUser) {
+    Optional<Order> order = orderRepository.findLastOrderInPending(currentUser.getId());
     return order.map(orderMapper::toDTO);
   }
 
@@ -196,7 +205,8 @@ public class OrderService {
   }
 
   public void assignDeliveryman(User currentUser, Long deliveryManId) {
-    Order order = orderRepository.findLastOrderInPending(currentUser.getId()).orElseThrow(
+    try {
+      Order order = orderRepository.findLastOrderInPending(currentUser.getId()).orElseThrow(
         () -> new RuntimeException("Você não possui uma entrega pendente.")
     );
     orderUtils.verifyIfOrderAlreadyHaveDeliveryMan(order, deliveryManId);
@@ -210,12 +220,15 @@ public class OrderService {
               .status(RequestStatus.SOLICITADO)
               .build();
           order.getRequests().add(request);
-          orderRepository.save(order);
+          orderRepository.saveAndFlush(order);
         },
         () -> {
           throw new RuntimeException("Entregador não encontrado.");
         }
     );
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public void cancelOrder(User currentUser, Long orderId) {
@@ -253,7 +266,7 @@ public class OrderService {
     requestRepository.save(request);
 
     Order order = orderRepository.findById(orderId).orElseThrow();
-    order.setStatus(OrderStatus.EM_ANDAMENTO);
+    order.setStatus(OrderStatus.ACEITO);
     order.setDeliveryman(currentUser);
     orderRepository.save(order);
   }

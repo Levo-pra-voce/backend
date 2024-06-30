@@ -6,6 +6,7 @@ import com.levopravoce.backend.entities.User;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.order.OrderService;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
+import com.levopravoce.backend.services.order.dto.RecommendUserDTO;
 import com.levopravoce.backend.services.order.dto.RequestDTO;
 import java.util.List;
 import java.util.Optional;
@@ -51,14 +52,21 @@ public class OrderResource {
 
   @GetMapping("/deliverymans")
   @PreAuthorize("authentication.principal.userType.name() == 'CLIENTE'")
-  public List<UserDTO> getDeliverymans() {
-    return this.orderService.getAllDeliveryMan();
+  public List<RecommendUserDTO> getDeliverymans() {
+    return this.orderService.getAllDeliveryManToOrder();
   }
 
   @GetMapping("/last-progress")
   public ResponseEntity<OrderDTO> getLastProgress() {
     User currentUser = SecurityUtils.getCurrentUserThrow();
     Optional<OrderDTO> orderDTO = this.orderService.getLatestOrderInProgress(currentUser);
+    return orderDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+  }
+
+  @GetMapping("/last-pending")
+  public ResponseEntity<OrderDTO> getLastPending() {
+    User currentUser = SecurityUtils.getCurrentUserThrow();
+    Optional<OrderDTO> orderDTO = this.orderService.getLatestOrderInPending(currentUser);
     return orderDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
   }
 

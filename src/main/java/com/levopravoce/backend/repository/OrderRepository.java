@@ -15,7 +15,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
       value = """
                     SELECT EXISTS(SELECT 1 FROM pedido u
                     WHERE u.id_cliente = :clientId
-                          AND u.status in ('ESPERANDO', 'EM_PROGRESSO'))
+                          AND u.status in ('ESPERANDO', 'ACEITO', 'EM_PROGRESSO'))
           """, nativeQuery = true)
   boolean existsByStatusInProgressOrPending(
       Long clientId
@@ -25,7 +25,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
       value = """
                     SELECT u FROM Order u
                       WHERE u.deliveryman.id = :deliveryUserId
-                        AND (u.status = 'ESPERANDO' or u.status = 'EM_PROGRESSO')
+                        AND (u.status = 'ESPERANDO' or u.status = 'EM_PROGRESSO' or u.status = 'ACEITO')
           """)
   List<Order> findByStatusPendingOrInProgress(
       Long deliveryUserId

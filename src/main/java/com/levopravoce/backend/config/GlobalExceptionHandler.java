@@ -14,9 +14,9 @@ public class GlobalExceptionHandler {
 
       @ExceptionHandler({ Exception.class })
       public final ResponseEntity<ApiError> handleException(Exception ex, WebRequest request) {
-          log.error("Handling exception: " + ex.getClass().getSimpleName() + " -> " + ex.getMessage());
-          ApiError apiError = new ApiError(500, ex.getMessage());
-          ex.printStackTrace();
+          String message = ex.getMessage();
+          log.error("Handling exception: " + ex.getClass().getSimpleName() + " -> " + message);
+          ApiError apiError = new ApiError(500, message.contains(":") ? message.split(":")[1].trim() : message);
           return ResponseEntity.status(apiError.status()).body(apiError);
       }
 }
