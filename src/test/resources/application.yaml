@@ -39,5 +39,10 @@ spring:
 jwt:
   secret: secret
 
+google:
+  map:
+    api:
+      key: AIzaSyDLUo_Xks5VkIA9XU_tn__vE99L1p8tsWY
+
 config:
   mockuser: false

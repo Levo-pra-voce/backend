@@ -88,6 +88,11 @@ public class OrderUtilsTest {
                 .width(1.0)
                 .maxWeight(1.0)
                 .deliveryDate(LocalDate.now().plusDays(1))
+                .haveSecurity(false)
+                .destinationLatitude(1.0)
+                .destinationLongitude(1.0)
+                .originLatitude(1.0)
+                .originLongitude(1.0)
                 .build();
         assertDoesNotThrow(() -> orderUtils.validateNewOrder(orderDTO));
     }
