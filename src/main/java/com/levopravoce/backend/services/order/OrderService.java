@@ -92,6 +92,7 @@ public class OrderService {
         currentUser.getVehicles().stream().filter(Vehicle::isActive).findFirst().orElse(null));
     order.setHaveSecurity(Optional.ofNullable(orderDTO.getHaveSecurity()).orElse(false));
     order.setStatus(OrderStatus.ESPERANDO);
+    order.setDeliveryDate(orderDTO.getDeliveryDate().atTime(0, 10, 0));
     return orderMapper.toDTO(orderRepository.save(order));
   }
 
