@@ -28,6 +28,7 @@ public interface OrderMapper {
   @Mapping(target = "destinationAddress", source = "destinationAddress")
   @Mapping(target = "originAddress", source = "originAddress")
   @Mapping(source = "order", target = "carPlate", qualifiedByName = "setCarPlate")
+  @Mapping(source = "deliveryDate", target = "deliveryDate")
   OrderDTO toDTO(Order order);
 
   @Named("setCarPlate")

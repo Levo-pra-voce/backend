@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.Order.OrderStatus;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ public class OrderDTO {
   private Double width;
   private Double maxWeight;
   @JsonFormat(pattern = "dd/MM/yyyy")
-  private LocalDate deliveryDate;
+  private LocalDateTime deliveryDate;
   private Boolean haveSecurity;
   private Order.OrderStatus status;
   private Double value;
@@ -34,7 +34,7 @@ public class OrderDTO {
   private Double price;
   private String carPlate;
 
-  public OrderDTO(Long id, Double height, Double width, Double maxWeight, LocalDate deliveryDate,
+  public OrderDTO(Long id, Double height, Double width, Double maxWeight, LocalDateTime deliveryDate,
       Boolean haveSecurity, OrderStatus status, Double value, UserDTO deliveryman, UserDTO client,
       Double averageRating, Double destinationLatitude, Double destinationLongitude,
       Double originLatitude, Double originLongitude, String destinationAddress,

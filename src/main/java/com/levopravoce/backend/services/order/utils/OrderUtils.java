@@ -3,6 +3,7 @@ package com.levopravoce.backend.services.order.utils;
 import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,11 +41,12 @@ public class OrderUtils {
     }
   }
 
-  public void validateDeliveryDate(LocalDate deliveryDate) {
+  public void validateDeliveryDate(LocalDateTime deliveryDate) {
     if (deliveryDate == null) {
       throw new IllegalArgumentException("Data de entrega inválida");
     }
-    if (deliveryDate.isBefore(LocalDate.now())) {
+    var localDate = deliveryDate.toLocalDate();
+    if (localDate.isBefore(LocalDate.now())) {
       throw new IllegalArgumentException("Data de entrega não pode ser anterior a data atual");
     }
   }

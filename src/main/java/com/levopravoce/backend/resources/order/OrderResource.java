@@ -128,4 +128,12 @@ public class OrderResource {
     User currentUser = SecurityUtils.getCurrentUserThrow();
     return this.orderService.getAssignOrders(currentUser);
   }
+
+  @PostMapping("/start/{id}")
+  @PreAuthorize("authentication.principal.userType.name() == 'ENTREGADOR'")
+  public ResponseEntity<Void> startOrder(@PathVariable Long id) {
+    User currentUser = SecurityUtils.getCurrentUserThrow();
+    this.orderService.startOrder(currentUser, id);
+    return ResponseEntity.noContent().build();
+  }
 }

@@ -2,6 +2,7 @@ package com.levopravoce.backend.order;
 
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import com.levopravoce.backend.services.order.utils.OrderUtils;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,8 @@ public class OrderUtilsTest {
 
     @Test
     public void givenOrderDTOWithPastDeliveryDate_whenValidateOrderFields_thenThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> orderUtils.validateDeliveryDate(LocalDate.now().minusDays(1)));
+        assertThrows(IllegalArgumentException.class, () -> orderUtils.validateDeliveryDate(
+            LocalDateTime.now().minusDays(1)));
     }
 
     @Test
@@ -87,7 +89,7 @@ public class OrderUtilsTest {
                 .height(1.0)
                 .width(1.0)
                 .maxWeight(1.0)
-                .deliveryDate(LocalDate.now().plusDays(1))
+                .deliveryDate(LocalDateTime.now().plusDays(1))
                 .haveSecurity(false)
                 .destinationLatitude(1.0)
                 .destinationLongitude(1.0)

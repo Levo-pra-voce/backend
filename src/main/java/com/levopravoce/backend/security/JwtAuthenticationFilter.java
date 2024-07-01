@@ -1,6 +1,8 @@
 package com.levopravoce.backend.security;
 
 import com.levopravoce.backend.entities.User;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -21,72 +23,83 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtTokenUtil jwtService;
-    private final UserDetailsService userService;
 
-    @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+  private final JwtTokenUtil jwtService;
+  private final UserDetailsService userService;
 
-        String authHeader = firstNonNull(
-            getJwtFromCookie(request),
-            request.getHeader("Authorization"),
-            request.getParameter("jwt")
-        );
-        
-        if (authHeader != null && !authHeader.startsWith("Bearer ")) {
-            authHeader = "Bearer " + authHeader;
-        }
+  @Override
+  protected void doFilterInternal(@NonNull HttpServletRequest request,
+      @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
+      throws ServletException, IOException {
 
-        final String jwt;
-        final String userEmail;
-        if (authHeader == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        jwt = authHeader.substring(7);
-        userEmail = jwtService.getUsernameFromToken(jwt);
-        if (userEmail != null && !userEmail.isEmpty()
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User userDetails = (User) userService
-                    .loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                Date expirationDate = jwtService.getExpirationDateFromToken(jwt);
-                userDetails.setExpirationDate(expirationDate);
-                SecurityContext context = SecurityContextHolder.createEmptyContext();
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                context.setAuthentication(authToken);
-                SecurityContextHolder.setContext(context);
-                Cookie jwtCookie = new Cookie("jwt", jwt);
-                jwtCookie.setHttpOnly(true);
-                response.addCookie(jwtCookie);
-            }
-        }
-        filterChain.doFilter(request, response);
+    String authHeader = firstNonNull(
+        getJwtFromCookie(request),
+        request.getHeader("Authorization"),
+        request.getParameter("jwt")
+    );
+
+    if (authHeader != null && !authHeader.startsWith("Bearer ")) {
+      authHeader = "Bearer " + authHeader;
     }
 
-    private String getJwtFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            return null;
+    final String jwt;
+    final String userEmail;
+    if (authHeader == null) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+    jwt = authHeader.substring(7);
+    try {
+      userEmail = jwtService.getUsernameFromToken(jwt);
+      if (userEmail != null && !userEmail.isEmpty()
+          && SecurityContextHolder.getContext().getAuthentication() == null) {
+        User userDetails = (User) userService
+            .loadUserByUsername(userEmail);
+        if (jwtService.isTokenValid(jwt, userDetails)) {
+          Date expirationDate = jwtService.getExpirationDateFromToken(jwt);
+          userDetails.setExpirationDate(expirationDate);
+          SecurityContext context = SecurityContextHolder.createEmptyContext();
+          UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+              userDetails, null, userDetails.getAuthorities());
+          authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+          context.setAuthentication(authToken);
+          SecurityContextHolder.setContext(context);
+          Cookie jwtCookie = new Cookie("jwt", jwt);
+          jwtCookie.setHttpOnly(true);
+          response.addCookie(jwtCookie);
         }
+      }
+    } catch (ExpiredJwtException e) {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().write("Token expired");
+      return;
+    } catch (JwtException e) {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().write("Invalid token");
+      return;
+    }
+    filterChain.doFilter(request, response);
+  }
 
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals("jwt") && cookie.isHttpOnly()) {
-                return cookie.getValue();
-            }
-        }
-        return null;
+  private String getJwtFromCookie(HttpServletRequest request) {
+    if (request.getCookies() == null) {
+      return null;
     }
 
-    private <T> T firstNonNull(T... values) {
-        for (T value : values) {
-            if (value != null) {
-                return value;
-            }
-        }
-        return null;
+    for (Cookie cookie : request.getCookies()) {
+      if (cookie.getName().equals("jwt") && cookie.isHttpOnly()) {
+        return cookie.getValue();
+      }
     }
+    return null;
+  }
+
+  private <T> T firstNonNull(T... values) {
+    for (T value : values) {
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
 }

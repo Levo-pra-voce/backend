@@ -35,7 +35,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -99,10 +102,6 @@ public class OrderService {
 
   public OrderDTO getOrderById(User currentUser, Long id) {
     Order order = orderRepository.findById(id).orElseThrow();
-
-    if (!currentUser.getId().equals(order.getDeliveryman().getId())) {
-      throw new RuntimeException("Você não tem permissão para visualizar este pedido.");
-    }
 
     return orderMapper.toDTO(order);
   }
@@ -207,25 +206,25 @@ public class OrderService {
   public void assignDeliveryman(User currentUser, Long deliveryManId) {
     try {
       Order order = orderRepository.findLastOrderInPending(currentUser.getId()).orElseThrow(
-        () -> new RuntimeException("Você não possui uma entrega pendente.")
-    );
-    orderUtils.verifyIfOrderAlreadyHaveDeliveryMan(order, deliveryManId);
-    Optional<User> deliveryManOptional = userRepository.findById(deliveryManId);
-    deliveryManOptional.ifPresentOrElse(
-        deliveryMan -> {
-          Request request = Request
-              .builder()
-              .deliveryman(deliveryMan)
-              .order(order)
-              .status(RequestStatus.SOLICITADO)
-              .build();
-          order.getRequests().add(request);
-          orderRepository.saveAndFlush(order);
-        },
-        () -> {
-          throw new RuntimeException("Entregador não encontrado.");
-        }
-    );
+          () -> new RuntimeException("Você não possui uma entrega pendente.")
+      );
+      orderUtils.verifyIfOrderAlreadyHaveDeliveryMan(order, deliveryManId);
+      Optional<User> deliveryManOptional = userRepository.findById(deliveryManId);
+      deliveryManOptional.ifPresentOrElse(
+          deliveryMan -> {
+            Request request = Request
+                .builder()
+                .deliveryman(deliveryMan)
+                .order(order)
+                .status(RequestStatus.SOLICITADO)
+                .build();
+            order.getRequests().add(request);
+            orderRepository.saveAndFlush(order);
+          },
+          () -> {
+            throw new RuntimeException("Entregador não encontrado.");
+          }
+      );
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -267,12 +266,43 @@ public class OrderService {
 
     Order order = orderRepository.findById(orderId).orElseThrow();
     order.setStatus(OrderStatus.ACEITO);
-    order.setDeliveryman(currentUser);
+    order.setDeliveryman(request.getDeliveryman());
+    order.setVehicle(
+        request.getDeliveryman().getVehicles().stream().filter(Vehicle::isActive).findFirst()
+            .orElse(null));
     orderRepository.save(order);
   }
 
   public List<RequestDTO> getAssignOrders(User currentUser) {
     List<Request> requests = requestRepository.findAllByDeliveryManAndOrder(currentUser.getId());
     return requests.stream().map(requestMapper::toDTO).toList();
+  }
+
+  public void startOrder(User currentUser, Long id) {
+    Order order = orderRepository.findById(id).orElseThrow();
+    if (!Objects.equals(order.getDeliveryman().getId(), currentUser.getId())) {
+      throw new RuntimeException("Você não tem permissão para iniciar este pedido.");
+    }
+    order.setStatus(OrderStatus.EM_PROGRESSO);
+    orderRepository.save(order);
+
+    List<WebSocketSession> webSocketsSessions = getWebSocketsSessionsByOrder(order);
+
+    OrderTrackingDTO orderTrackingDTO = OrderTrackingDTO.builder().orderId(order.getId())
+        .status(OrderTrackingStatus.STARTED).build();
+
+    try {
+      String orderTrackingJson = objectMapper.writeValueAsString(orderTrackingDTO);
+      webSocketsSessions.forEach(webSocketSession -> {
+        try {
+          TextMessage textMessage = new TextMessage(orderTrackingJson);
+          webSocketSession.sendMessage(textMessage);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      });
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

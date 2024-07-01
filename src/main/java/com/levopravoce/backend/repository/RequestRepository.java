@@ -17,7 +17,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
   @Query(
       value = """
               SELECT u FROM Request u
-                  WHERE u.deliveryman.id = :deliveryId
+                  WHERE u.deliveryman.id = :deliveryId and u.order.status = 'ESPERANDO'
           """)
   List<Request> findAllByDeliveryManAndOrder(Long deliveryId);
 }
