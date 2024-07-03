@@ -75,7 +75,7 @@ public class OrderUtilsTest {
     @Test
     public void givenOrderDTOWithPastDeliveryDate_whenValidateOrderFields_thenThrowIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> orderUtils.validateDeliveryDate(
-            LocalDateTime.now().minusDays(1)));
+            LocalDate.now().minusDays(1)));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class OrderUtilsTest {
                 .height(1.0)
                 .width(1.0)
                 .maxWeight(1.0)
-                .deliveryDate(LocalDateTime.now().plusDays(1))
+                .deliveryDate(LocalDate.now().plusDays(1))
                 .haveSecurity(false)
                 .destinationLatitude(1.0)
                 .destinationLongitude(1.0)
