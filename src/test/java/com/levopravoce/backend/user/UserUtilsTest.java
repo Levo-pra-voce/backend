@@ -107,14 +107,15 @@ public class UserUtilsTest {
   @Test
   @DisplayName("Verifica se os usuários estão sendo persistidos corretamente")
   public void givenUserDTO_whenSaveUser_thenPersistUser() {
+    // Obtém o serviço de gerenciamento de usuários para o tipo CLIENTE
     UserManagement userManagementClient = userManagementDeciderService.getServiceByType(
         UserType.CLIENTE);
+    // Salva o usuário cliente
     userManagementClient.save(InicialDataConfiguration.userClientDTO);
 
     // Obtém o serviço de gerenciamento de usuários para o tipo ENTREGADOR
     UserManagement userManagementDelivery = userManagementDeciderService.getServiceByType(
         UserType.ENTREGADOR);
-
     // Salva o usuário entregador
     userManagementDelivery.save(InicialDataConfiguration.userDeliveryDTO);
     userRepository.deleteAll();
