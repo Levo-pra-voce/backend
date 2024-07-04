@@ -37,7 +37,7 @@ spring:
           starttls:
             enable: true
 jwt:
-  secret: secret
+  secret: tnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7TotnKVXNLyr7To
 
 google:
   map:

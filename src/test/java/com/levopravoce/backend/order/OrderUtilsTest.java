@@ -1,7 +1,9 @@
 package com.levopravoce.backend.order;
 
+import com.levopravoce.backend.repository.UserRepository;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import com.levopravoce.backend.services.order.utils.OrderUtils;
+import com.levopravoce.backend.services.user.UserManagementDeciderService;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OrderUtilsTest {
     private final OrderUtils orderUtils;
+    private final UserManagementDeciderService userManagementDeciderService;
+    private final UserRepository userRepository;
 
     @Test
     @DisplayName("A largura não pode ser negativa")
