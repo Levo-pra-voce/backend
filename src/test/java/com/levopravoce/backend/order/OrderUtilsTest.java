@@ -20,7 +20,7 @@ public class OrderUtilsTest {
     private final OrderUtils orderUtils;
 
     @Test
-    @DisplayName("A altura não pode ser negativa")
+    @DisplayName("A largura não pode ser negativa")
     public void givenOrderDTOWithNegativeWidth_whenValidateOrderFields_thenThrowIllegalArgumentException() {
         Double width = -1.0;
         assertThrows(IllegalArgumentException.class, () -> orderUtils.validateWidth(width));
