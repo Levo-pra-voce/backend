@@ -1,5 +1,6 @@
 package com.levopravoce.backend.user;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.levopravoce.backend.common.UserUtils;
@@ -47,6 +48,17 @@ public class UserUtilsTest {
     public void givenUserDTOWithPasswordLessThanSixCharacters_whenValidateUserFields_thenThrowIllegalArgumentException() {
         String password = "12345";
         assertThrows(IllegalArgumentException.class, () -> userUtils.validatePassword(password));
+    }
+
+    @Test
+    @DisplayName("verifica se a senha deve conter ao menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um número")
+    public void givenUserDTOWithPasswordLessThanValid_whenValidateUserFields_thenThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> userUtils.validatePassword("12345678"));
+        assertThrows(IllegalArgumentException.class, () -> userUtils.validatePassword("abcdefgh"));
+        assertThrows(IllegalArgumentException.class, () -> userUtils.validatePassword("ABCDEFGH"));
+        assertThrows(IllegalArgumentException.class, () -> userUtils.validatePassword("12345678abcdefgh"));
+        assertThrows(IllegalArgumentException.class, () -> userUtils.validatePassword("Df23"));
+        assertDoesNotThrow(() -> userUtils.validatePassword("Df2345678"));
     }
 
     @Test
