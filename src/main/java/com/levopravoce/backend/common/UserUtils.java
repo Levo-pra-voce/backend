@@ -51,6 +51,18 @@ public class UserUtils {
     validateCpf(userDTO.getCpf());
   }
 
+  public void validatePriceBase(Double priceBase) {
+    if (priceBase == null || priceBase < 0) {
+      throw new IllegalArgumentException("Preço base é obrigatório e deve ser maior");
+    }
+  }
+
+  public void validatePricePerKm(Double pricePerKm) {
+    if (pricePerKm == null || pricePerKm < 0) {
+      throw new IllegalArgumentException("Preço por km é obrigatório e deve ser maior");
+    }
+  }
+
   public void validateAcceptTerms(Boolean acceptTerms) {
     if (acceptTerms == null || !acceptTerms) {
       throw new IllegalArgumentException("Termos de uso devem ser aceitos");
