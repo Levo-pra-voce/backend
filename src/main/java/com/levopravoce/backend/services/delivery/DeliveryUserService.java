@@ -35,8 +35,6 @@ public class DeliveryUserService implements UserManagement {
   public JwtResponseDTO save(UserDTO userDTO) {
     userUtils.validateNewCommonUser(userDTO);
     userUtils.validateCnh(userDTO.getCnh());
-    userUtils.validatePriceBase(userDTO.getPriceBase());
-    userUtils.validatePricePerKm(userDTO.getPricePerKm());
     if (userRepository.existsByEmail(userDTO.getEmail())) {
       throw new IllegalArgumentException("Email já foi cadastrado");
     }

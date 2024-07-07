@@ -91,7 +91,8 @@ public class UserUtils {
     }
 
     if (passwordIsInvalid(password)) {
-      throw new IllegalArgumentException("Senha deve conter ao menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um número");
+      throw new IllegalArgumentException(
+          "Senha deve conter ao menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um número");
     }
   }
 
@@ -127,6 +128,11 @@ public class UserUtils {
     if (!cpf.matches("[0-9]+")) {
       throw new IllegalArgumentException("CPF deve conter apenas números");
     }
+  }
+
+  public Double calcPrice(Double priceBase, Double pricePerKm, Long distanceMeters) {
+    Long distanceKm = distanceMeters / 1000;
+    return priceBase + (pricePerKm * distanceKm);
   }
 
   public boolean passwordIsInvalid(String password) {

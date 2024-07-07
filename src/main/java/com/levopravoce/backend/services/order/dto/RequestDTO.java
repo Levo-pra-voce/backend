@@ -18,7 +18,7 @@ public class RequestDTO {
   private Double distanceKm;
   @JsonFormat(pattern = "dd/MM/yyyy")
   private LocalDateTime deliveryDate;
-  private Double price = 200.0;
+  private Double price;
   private Double averageRating = 5.0;
 
   public RequestDTO(Long orderId, Long deliveryManId, String name, String destinationAddress, String originAddress, Double distanceKm,

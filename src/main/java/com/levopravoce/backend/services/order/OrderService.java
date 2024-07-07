@@ -3,6 +3,7 @@ package com.levopravoce.backend.services.order;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.levopravoce.backend.common.SecurityUtils;
+import com.levopravoce.backend.common.UserUtils;
 import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.Order.OrderStatus;
 import com.levopravoce.backend.entities.Request;
@@ -31,12 +32,12 @@ import com.levopravoce.backend.socket.dto.MessageSocketDTO;
 import com.levopravoce.backend.socket.dto.MessageType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.TextMessage;
@@ -56,6 +57,7 @@ public class OrderService {
   private final RequestMapper requestMapper;
   private final RequestRepository requestRepository;
   private final RequestUtils requestUtils;
+  private final UserUtils userUtils;
 
   public OrderDTO createOrder(OrderDTO orderDTO) {
     orderUtils.validateNewOrder(orderDTO);
@@ -108,17 +110,28 @@ public class OrderService {
   }
 
   public List<RecommendUserDTO> getAllDeliveryManToOrder() {
+    User currentUser = SecurityUtils.getCurrentUser().orElseThrow();
+    Order order = orderRepository.findLastOrderInPending(currentUser.getId())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "Não há pedidos pendentes."));
+
     return userRepository.findAll()
         .stream()
         .filter(user -> Objects.equals(user.getUserType(), UserType.ENTREGADOR))
-        .map(user ->
-            RecommendUserDTO
-                .builder()
-                .userId(user.getId())
-                .name(user.getName())
-                .phone(user.getContact())
-                .build()
+        .map(user -> {
+              Vehicle userVehicle = user.getVehicles().stream().filter(Vehicle::isActive).findFirst()
+                  .orElse(null);
+              return RecommendUserDTO
+                  .builder()
+                  .userId(user.getId())
+                  .name(user.getName())
+                  .phone(user.getContact())
+                  .price(userUtils.calcPrice(userVehicle.getPriceBase(), userVehicle.getPricePerKm(),
+                      order.getDistanceMeters()))
+                  .build();
+            }
         )
+        .sorted(Comparator.comparing(RecommendUserDTO::getPrice))
         .toList();
   }
 
@@ -266,7 +279,12 @@ public class OrderService {
     requestRepository.save(request);
 
     Order order = orderRepository.findById(orderId).orElseThrow();
+    User deliveryman = request.getDeliveryman();
+    Vehicle vehicle = deliveryman.getVehicles().stream().filter(Vehicle::isActive).findFirst()
+        .orElse(null);
     order.setStatus(OrderStatus.ACEITO);
+    order.setValue(userUtils.calcPrice(vehicle.getPriceBase(), vehicle.getPricePerKm(),
+        order.getDistanceMeters()));
     order.setDeliveryman(request.getDeliveryman());
     order.setVehicle(
         request.getDeliveryman().getVehicles().stream().filter(Vehicle::isActive).findFirst()

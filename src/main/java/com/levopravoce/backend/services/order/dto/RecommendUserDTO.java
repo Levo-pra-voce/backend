@@ -19,7 +19,7 @@ public class RecommendUserDTO {
       String phone) {
     this.userId = userId;
     this.name = name;
-    this.price = Optional.ofNullable(price).orElse(200.0);
+    this.price = price;
     this.averageRating = 5.0;
     this.phone = phone;
   }
