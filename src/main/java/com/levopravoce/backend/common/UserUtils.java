@@ -104,7 +104,41 @@ public class UserUtils {
     if (cnh.length() != 11) {
       throw new IllegalArgumentException("CNH deve conter 11 dígitos");
     }
+
+    if (!isValidCNH(cnh)) {
+      throw new IllegalArgumentException("CNH inválida");
+    }
   }
+
+   public static boolean isValidCNH(String cnh) {
+        if (cnh == null || cnh.length() != 11 || !cnh.matches("\\d{11}")) {
+            return false;
+        }
+
+        int sum1 = 0;
+        int sum2 = 0;
+        int weight1 = 9;
+        int weight2 = 1;
+
+        for (int i = 0; i < 9; i++) {
+            int digit = Character.getNumericValue(cnh.charAt(i));
+            sum1 += digit * (weight1 - i);
+            sum2 += digit * (weight2 + i);
+        }
+
+        int digit1 = sum1 % 11;
+        int digit2 = sum2 % 11;
+
+        if (digit1 == 10) {
+            digit1 = 0;
+        }
+
+        if (digit2 == 10) {
+            digit2 = 0;
+        }
+
+        return digit1 == Character.getNumericValue(cnh.charAt(9)) && digit2 == Character.getNumericValue(cnh.charAt(10));
+    }
 
   public void validatePhone(String phone) {
     if (phone == null || phone.isEmpty()) {
