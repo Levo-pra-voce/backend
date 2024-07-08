@@ -35,7 +35,7 @@ public class InicialDataConfiguration {
       .cnh("31934388230")
       .email("levopravoceentregador@gmail.com")
       .password("Teste1234")
-      .phone("48987654321")
+      .phone("4899924955")
       .userType(UserType.ENTREGADOR)
       .status("ACTIVE")
       .city("Florianópolis")
