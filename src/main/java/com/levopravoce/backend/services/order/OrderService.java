@@ -105,8 +105,11 @@ public class OrderService {
 
   public OrderDTO getOrderById(User currentUser, Long id) {
     Order order = orderRepository.findById(id).orElseThrow();
-
-    return orderMapper.toDTO(order);
+    Vehicle vehicle = currentUser.getVehicles().stream().filter(Vehicle::isActive).findFirst()
+        .orElse(null);
+    OrderDTO orderDTO = orderMapper.toDTO(order);
+    orderDTO.setPrice(userUtils.calcPrice(vehicle.getPriceBase(), vehicle.getPricePerKm(), order.getDistanceMeters()));
+    return orderDTO;
   }
 
   public List<RecommendUserDTO> getAllDeliveryManToOrder() {
@@ -294,7 +297,15 @@ public class OrderService {
 
   public List<RequestDTO> getAssignOrders(User currentUser) {
     List<Request> requests = requestRepository.findAllByDeliveryManAndOrder(currentUser.getId());
-    return requests.stream().map(requestMapper::toDTO).toList();
+    return requests.stream().map(request -> {
+      RequestDTO requestDTO = requestMapper.toDTO(request);
+      Vehicle vehicle = request.getDeliveryman().getVehicles().stream().filter(Vehicle::isActive)
+          .findFirst().orElse(null);
+      Order order = request.getOrder();
+      requestDTO.setPrice(userUtils.calcPrice(vehicle.getPriceBase(), vehicle.getPricePerKm(),
+          order.getDistanceMeters()));
+      return requestDTO;
+    }).toList();
   }
 
   public void startOrder(User currentUser, Long id) {

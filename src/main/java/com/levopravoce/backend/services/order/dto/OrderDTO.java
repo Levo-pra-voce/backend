@@ -61,7 +61,7 @@ public class OrderDTO {
     this.destinationAddress = destinationAddress;
     this.originAddress = originAddress;
     this.carPlate = carPlate;
-    this.price = haveSecurity ? 220.0 : 200.0;
+    this.price = price;
     this.averageRating = 5.0;
   }
 //    private VehicleDTO vehicle;
