@@ -52,7 +52,8 @@ public class DeliveryUserService implements UserManagement {
     }
 
     vehicleUtils.validateNewVehicle(userDTO.getVehicle());
-    userDTO.getVehicle().setActive(true);
+    Vehicle vehicle = userDTO.getVehicle();
+    vehicle.setActive(true);
     User user =
         User.builder()
             .cpf(userDTO.getCpf())
@@ -65,7 +66,7 @@ public class DeliveryUserService implements UserManagement {
             .creationDate(LocalDateTime.now())
             .userType(UserType.ENTREGADOR)
             .addresses(List.of(userUtils.buildAddressByUserDTO(userDTO)))
-            .vehicles(List.of(Objects.requireNonNull(userDTO.getVehicle())))
+            .vehicles(List.of(Objects.requireNonNull(vehicle)))
             .build();
 
     userRepository.save(user);
