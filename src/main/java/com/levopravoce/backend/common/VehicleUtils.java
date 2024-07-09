@@ -18,7 +18,7 @@ public class VehicleUtils {
     validateHeight(vehicle.getHeight());
     validateWidth(vehicle.getWidth());
     validateMaxWeight(vehicle.getMaxWeight());
-    validateRenavam(vehicle.getRenavam());
+    validateRenavam(vehicle.getRenavam(), true);
     validatePriceBase(vehicle.getPriceBase());
     validatePricePerKm(vehicle.getPricePerKm());
   }
@@ -29,7 +29,7 @@ public class VehicleUtils {
     validateHeight(vehicle.getHeight());
     validateWidth(vehicle.getWidth());
     validateMaxWeight(vehicle.getMaxWeight());
-    validateRenavam(vehicle.getRenavam());
+    validateRenavam(vehicle.getRenavam(), false);
     validatePriceBase(vehicle.getPriceBase());
     validatePricePerKm(vehicle.getPricePerKm());
   }
@@ -92,7 +92,7 @@ public class VehicleUtils {
     }
   }
 
-  public void validateRenavam(String renavam) {
+  public void validateRenavam(String renavam, boolean isNewUser) {
     if (renavam == null || renavam.isEmpty()) {
       throw new IllegalArgumentException("Renavam é obrigatório");
     }
