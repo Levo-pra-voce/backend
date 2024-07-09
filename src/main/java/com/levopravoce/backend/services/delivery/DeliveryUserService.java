@@ -52,6 +52,7 @@ public class DeliveryUserService implements UserManagement {
     }
 
     vehicleUtils.validateNewVehicle(userDTO.getVehicle());
+    userDTO.getVehicle().setActive(true);
     User user =
         User.builder()
             .cpf(userDTO.getCpf())
