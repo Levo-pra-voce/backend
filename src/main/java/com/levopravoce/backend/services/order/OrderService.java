@@ -323,9 +323,17 @@ public class OrderService {
 
     try {
       String orderTrackingJson = objectMapper.writeValueAsString(orderTrackingDTO);
+      MessageSocketDTO messageSocketDTO = MessageSocketDTO.builder()
+              .type(MessageType.TEXT)
+              .message(orderTrackingJson)
+              .timestamp(System.currentTimeMillis())
+              .sender(currentUser.getUsername())
+              .receiver(order.getDeliveryman().getUsername())
+              .destination(WebSocketDestination.ORDER_MAP)
+              .build();
       webSocketsSessions.forEach(webSocketSession -> {
         try {
-          TextMessage textMessage = new TextMessage(orderTrackingJson);
+          TextMessage textMessage = new TextMessage(objectMapper.writeValueAsString(messageSocketDTO));
           webSocketSession.sendMessage(textMessage);
         } catch (Exception e) {
           throw new RuntimeException(e);
