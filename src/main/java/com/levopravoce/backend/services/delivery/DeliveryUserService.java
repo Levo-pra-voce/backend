@@ -94,7 +94,7 @@ public class DeliveryUserService implements UserManagement {
       currentUser.setContact(updatedUserDTO.getPhone());
     }
 
-    vehicleUtils.validateNewVehicle(updatedUserDTO.getVehicle());
+    vehicleUtils.validateUpdateVehicle(updatedUserDTO.getVehicle());
     vehicleRepository.disableAllVehiclesByUserId(currentUser.getId());
     List<Vehicle> vehicles = currentUser.getVehicles();
     Vehicle updatedVehicle = updatedUserDTO.getVehicle();

@@ -23,6 +23,17 @@ public class VehicleUtils {
     validatePricePerKm(vehicle.getPricePerKm());
   }
 
+  public void validateUpdateVehicle(Vehicle vehicle) {
+    validateModel(vehicle.getModel());
+    validateColor(vehicle.getColor());
+    validateHeight(vehicle.getHeight());
+    validateWidth(vehicle.getWidth());
+    validateMaxWeight(vehicle.getMaxWeight());
+    validateRenavam(vehicle.getRenavam());
+    validatePriceBase(vehicle.getPriceBase());
+    validatePricePerKm(vehicle.getPricePerKm());
+  }
+
   public void validatePlate(String plate) {
     if (plate == null || plate.isEmpty()) {
       throw new IllegalArgumentException("Placa é obrigatória");
