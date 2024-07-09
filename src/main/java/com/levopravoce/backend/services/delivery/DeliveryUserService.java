@@ -13,6 +13,8 @@ import com.levopravoce.backend.services.authenticate.dto.JwtResponseDTO;
 import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.user.UserManagement;
 import jakarta.transaction.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -54,6 +56,7 @@ public class DeliveryUserService implements UserManagement {
     vehicleUtils.validateNewVehicle(userDTO.getVehicle());
     Vehicle vehicle = userDTO.getVehicle();
     vehicle.setActive(true);
+    vehicle.setCreationDate(LocalDateTime.now());
     User user =
         User.builder()
             .cpf(userDTO.getCpf())
