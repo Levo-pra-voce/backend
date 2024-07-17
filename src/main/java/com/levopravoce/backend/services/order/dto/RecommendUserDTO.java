@@ -1,12 +1,15 @@
 package com.levopravoce.backend.services.order.dto;
 
+import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class RecommendUserDTO {
   private Long userId;
@@ -14,13 +17,5 @@ public class RecommendUserDTO {
   private Double price;
   private Double averageRating;
   private String phone;
-
-  public RecommendUserDTO(Long userId, String name, Double price, Double averageRating,
-      String phone) {
-    this.userId = userId;
-    this.name = name;
-    this.price = price;
-    this.averageRating = 5.0;
-    this.phone = phone;
-  }
+  private List<RatingDTO> ratings;
 }

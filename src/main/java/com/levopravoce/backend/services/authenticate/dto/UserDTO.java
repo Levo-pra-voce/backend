@@ -34,13 +34,14 @@ public class UserDTO {
   private Double pricePerKm;
   private Boolean acceptTerms;
   private Byte[] profilePicture;
+  private String contact;
   private Double averageRating;
 
   public UserDTO(Long id, String name, String email, String password, String phone, String cpf,
       String cnh, String city, String state, String zipCode, String country, String status,
       String complement, String neighborhood, String street, UserType userType, Vehicle vehicle,
       String token, String addressNumber, Double priceBase, Double pricePerKm, Boolean acceptTerms,
-      Byte[] profilePicture, Double averageRating) {
+      Byte[] profilePicture, String contact, Double averageRating) {
     this.id = id;
     this.name = name;
     this.email = email;
@@ -65,5 +66,6 @@ public class UserDTO {
     this.acceptTerms = acceptTerms;
     this.profilePicture = profilePicture;
     this.averageRating = 5.0;
+    this.contact = contact;
   }
 }

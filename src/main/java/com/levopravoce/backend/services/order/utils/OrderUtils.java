@@ -1,6 +1,7 @@
 package com.levopravoce.backend.services.order.utils;
 
 import com.levopravoce.backend.entities.Order;
+import com.levopravoce.backend.entities.Rating;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import org.springframework.stereotype.Component;
 
@@ -80,5 +81,15 @@ public class OrderUtils {
                 throw new IllegalArgumentException("Entregador já atribuído ao pedido.");
             }
         });
+    }
+
+    public Double calculateAverageRating(List<Rating> ratings) {
+        if (ratings.isEmpty()) {
+            return 5.0;
+        }
+        return ratings.stream()
+                .mapToDouble(Rating::getNote)
+                .average()
+                .orElse(5.0);
     }
 }

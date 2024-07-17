@@ -115,13 +115,15 @@ drop table if exists avaliacao;
 
 create table avaliacao (
                            id           serial primary key,
-                           id_usuario   bigint,
-                           id_veiculo   bigint,
+                           id_pedido    bigint,
+                           id_entregador bigint,
+                           id_cliente   bigint,
+                           comentario   text,
                            nota         numeric(2, 1),
                            data_criacao timestamp default now(),
-                           ativo        boolean,
-                           foreign key (id_usuario) references usuario (id),
-                           foreign key (id_veiculo) references veiculo (id)
+                           foreign key (id_cliente) references usuario (id),
+                           foreign key (id_entregador) references usuario (id),
+                           foreign key (id_pedido) references pedido (id)
 );
 
 drop table if exists pedido cascade;

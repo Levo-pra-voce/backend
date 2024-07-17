@@ -164,9 +164,13 @@ public class UserUtils {
     }
   }
 
-  public Double calcPrice(Double priceBase, Double pricePerKm, Long distanceMeters) {
+  public Double calcPrice(Double priceBase, Double pricePerKm, Long distanceMeters, Boolean haveSecurity) {
     Long distanceKm = distanceMeters / 1000;
-    return priceBase + (pricePerKm * distanceKm);
+    double calculateValue = priceBase + (pricePerKm * distanceKm);
+    if (haveSecurity) {
+      calculateValue += calculateValue * 0.1;
+    }
+    return calculateValue;
   }
 
   public boolean passwordIsInvalid(String password) {

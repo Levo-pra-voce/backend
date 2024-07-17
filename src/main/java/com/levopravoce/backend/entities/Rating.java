@@ -1,6 +1,7 @@
 package com.levopravoce.backend.entities;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
@@ -9,18 +10,23 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario")
-    private User user;
+    @ManyToOne
+    @JoinColumn(name = "id_pedido")
+    private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_veiculo")
-    private Vehicle vehicle;
+    @ManyToOne
+    @JoinColumn(name = "id_entregador")
+    private User deliveryMan;
+
+    @ManyToOne
+    @JoinColumn(name = "id_cliente")
+    private User client;
 
     @Column(name = "nota")
     private Integer note;
@@ -28,9 +34,6 @@ public class Rating {
     @Column(name = "comentario")
     private String comment;
 
-    @Column(name = "ativo")
-    private boolean active = false;
-
     @Column(name = "data_criacao")
-    private String creationDate;
+    private LocalDateTime creationDate;
 }

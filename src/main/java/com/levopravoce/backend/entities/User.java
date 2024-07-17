@@ -11,18 +11,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,61 +37,47 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "usuario")
 public class User implements UserDetails {
 
-  public User(Long id) {
-    this.id = id;
-  }
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   @Column(name = "senha")
   private String password;
-
   @Column(name = "email")
   private String email;
-
   @Column(name = "nome")
   private String name;
-
   @Column(name = "cpf")
   private String cpf;
-
   @Column(name = "cnh")
   private String cnh;
-
   @Enumerated(EnumType.STRING)
   private Status status = Status.INACTIVE;
-
   @Column(name = "tipo")
   @Enumerated(EnumType.STRING)
   private UserType userType;
-
   @Column(name = "ativo")
   private Boolean active = false;
-
   @Column(name = "data_criacao")
   private LocalDateTime creationDate;
   @Column(name = "contato")
   private String contact;
-
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "id_usuario")
   private List<Address> addresses;
-
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinColumn(name = "id_usuario")
   private List<Vehicle> vehicles;
-
-  @OneToMany
-  @JoinColumn(name = "id_usuario")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "id_entregador")
   private List<Rating> ratings;
-
   @Transient
   private Date expirationDate;
-
   @Column(name = "foto")
   private byte[] profilePicture;
+
+  public User(Long id) {
+    this.id = id;
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -151,7 +133,11 @@ public class User implements UserDetails {
   public UserDTO toDTO() {
     Address address = this.getAddresses().stream().findFirst().orElse(null);
 
-    return UserDTO.builder().id(this.getId()).email(this.getEmail()).name(this.getName())
+    return UserDTO.builder()
+        .id(this.getId())
+        .email(this.getEmail())
+        .name(this.getName())
+        .contact(this.getContact())
         .zipCode(Optional.ofNullable(address).map(Address::getZipCode).orElse(null))
         .city(Optional.ofNullable(address).map(Address::getCity).orElse(null))
         .complement(Optional.ofNullable(address).map(Address::getComplement).orElse(null))

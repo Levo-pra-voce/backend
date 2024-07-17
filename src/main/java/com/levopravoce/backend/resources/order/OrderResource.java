@@ -3,11 +3,11 @@ package com.levopravoce.backend.resources.order;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.entities.User;
-import com.levopravoce.backend.services.authenticate.dto.UserDTO;
 import com.levopravoce.backend.services.order.OrderService;
 import com.levopravoce.backend.services.order.dto.OrderDTO;
 import com.levopravoce.backend.services.order.dto.RecommendUserDTO;
 import com.levopravoce.backend.services.order.dto.RequestDTO;
+import com.levopravoce.backend.services.order.dto.RatingDTO;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -134,6 +134,17 @@ public class OrderResource {
   public ResponseEntity<Void> startOrder(@PathVariable Long id) {
     User currentUser = SecurityUtils.getCurrentUserThrow();
     this.orderService.startOrder(currentUser, id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/review/{orderId}")
+  @PreAuthorize("authentication.principal.userType.name() == 'CLIENTE'")
+  public ResponseEntity<Void> reviewOrder(
+      @PathVariable Long orderId,
+      @RequestBody RatingDTO ratingDTO
+  ) {
+    this.orderService
+        .reviewOrder(orderId, ratingDTO);
     return ResponseEntity.noContent().build();
   }
 }

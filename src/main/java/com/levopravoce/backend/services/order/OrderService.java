@@ -6,6 +6,7 @@ import com.levopravoce.backend.common.SecurityUtils;
 import com.levopravoce.backend.common.UserUtils;
 import com.levopravoce.backend.entities.Order;
 import com.levopravoce.backend.entities.Order.OrderStatus;
+import com.levopravoce.backend.entities.Rating;
 import com.levopravoce.backend.entities.Request;
 import com.levopravoce.backend.entities.Request.RequestStatus;
 import com.levopravoce.backend.entities.User;
@@ -20,6 +21,7 @@ import com.levopravoce.backend.services.order.dto.OrderDTO;
 import com.levopravoce.backend.services.order.dto.OrderPaymentDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingDTO;
 import com.levopravoce.backend.services.order.dto.OrderTrackingStatus;
+import com.levopravoce.backend.services.order.dto.RatingDTO;
 import com.levopravoce.backend.services.order.dto.RecommendUserDTO;
 import com.levopravoce.backend.services.order.dto.RequestDTO;
 import com.levopravoce.backend.services.order.mapper.OrderMapper;
@@ -108,7 +110,8 @@ public class OrderService {
     Vehicle vehicle = currentUser.getVehicles().stream().filter(Vehicle::isActive).findFirst()
         .orElse(null);
     OrderDTO orderDTO = orderMapper.toDTO(order);
-    orderDTO.setPrice(userUtils.calcPrice(vehicle.getPriceBase(), vehicle.getPricePerKm(), order.getDistanceMeters()));
+    orderDTO.setPrice(userUtils.calcPrice(vehicle.getPriceBase(), vehicle.getPricePerKm(),
+        order.getDistanceMeters(), order.getHaveSecurity()));
     return orderDTO;
   }
 
@@ -130,7 +133,18 @@ public class OrderService {
                   .name(user.getName())
                   .phone(user.getContact())
                   .price(userUtils.calcPrice(userVehicle.getPriceBase(), userVehicle.getPricePerKm(),
-                      order.getDistanceMeters()))
+                      order.getDistanceMeters(), order.getHaveSecurity()))
+                  .averageRating(orderUtils.calculateAverageRating(
+                      Optional.ofNullable(user.getRatings()).orElse(new ArrayList<>())))
+                  .ratings(Optional.ofNullable(user.getRatings()).orElse(new ArrayList<>())
+                      .stream()
+                      .map(rating -> RatingDTO.builder()
+                          .comment(rating.getComment())
+                          .creationDate(rating.getCreationDate())
+                          .note(rating.getNote())
+                          .build())
+                      .toList()
+                  )
                   .build();
             }
         )
@@ -183,7 +197,10 @@ public class OrderService {
     order.setStatus(OrderStatus.FEITO_PAGAMENTO);
     orderRepository.save(order);
     List<WebSocketSession> webSocketsSessions = getWebSocketsSessionsByOrder(order);
-    OrderPaymentDTO orderPaymentDTO = OrderPaymentDTO.builder().isPaid(true).build();
+    OrderPaymentDTO orderPaymentDTO = OrderPaymentDTO.builder()
+        .isPaid(true)
+        .orderId(order.getId())
+        .build();
     String orderPaymentJson = objectMapper.writeValueAsString(orderPaymentDTO);
     MessageSocketDTO messageSocketDTO = mountMessageSocketDTOByOrder(orderPaymentJson,
         WebSocketDestination.ORDER_PAYMENT, order);
@@ -287,7 +304,7 @@ public class OrderService {
         .orElse(null);
     order.setStatus(OrderStatus.ACEITO);
     order.setValue(userUtils.calcPrice(vehicle.getPriceBase(), vehicle.getPricePerKm(),
-        order.getDistanceMeters()));
+        order.getDistanceMeters(), order.getHaveSecurity()));
     order.setDeliveryman(request.getDeliveryman());
     order.setVehicle(
         request.getDeliveryman().getVehicles().stream().filter(Vehicle::isActive).findFirst()
@@ -303,7 +320,7 @@ public class OrderService {
           .findFirst().orElse(null);
       Order order = request.getOrder();
       requestDTO.setPrice(userUtils.calcPrice(vehicle.getPriceBase(), vehicle.getPricePerKm(),
-          order.getDistanceMeters()));
+          order.getDistanceMeters(), order.getHaveSecurity()));
       return requestDTO;
     }).toList();
   }
@@ -324,16 +341,17 @@ public class OrderService {
     try {
       String orderTrackingJson = objectMapper.writeValueAsString(orderTrackingDTO);
       MessageSocketDTO messageSocketDTO = MessageSocketDTO.builder()
-              .type(MessageType.TEXT)
-              .message(orderTrackingJson)
-              .timestamp(System.currentTimeMillis())
-              .sender(currentUser.getUsername())
-              .receiver(order.getDeliveryman().getUsername())
-              .destination(WebSocketDestination.ORDER_MAP)
-              .build();
+          .type(MessageType.TEXT)
+          .message(orderTrackingJson)
+          .timestamp(System.currentTimeMillis())
+          .sender(currentUser.getUsername())
+          .receiver(order.getDeliveryman().getUsername())
+          .destination(WebSocketDestination.ORDER_MAP)
+          .build();
       webSocketsSessions.forEach(webSocketSession -> {
         try {
-          TextMessage textMessage = new TextMessage(objectMapper.writeValueAsString(messageSocketDTO));
+          TextMessage textMessage = new TextMessage(
+              objectMapper.writeValueAsString(messageSocketDTO));
           webSocketSession.sendMessage(textMessage);
         } catch (Exception e) {
           throw new RuntimeException(e);
@@ -342,5 +360,27 @@ public class OrderService {
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void reviewOrder(Long orderId, RatingDTO ratingDTO) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new RuntimeException("Pedido não encontrado."));
+    if (order.getStatus() != OrderStatus.ENTREGADO && order.getStatus() != OrderStatus.FEITO_PAGAMENTO) {
+      throw new RuntimeException("Pedido não foi entregue.");
+    }
+    Rating rating = Rating.builder()
+        .order(order)
+        .client(order.getClient())
+        .deliveryMan(order.getDeliveryman())
+        .comment(ratingDTO.getComment())
+        .note(ratingDTO.getNote())
+        .creationDate(LocalDateTime.now())
+        .build();
+
+    User deliveryMan = order.getDeliveryman();
+    List<Rating> ratings = Optional.ofNullable(deliveryMan.getRatings()).orElse(new ArrayList<>());
+    ratings.add(rating);
+    deliveryMan.setRatings(ratings);
+    userRepository.save(deliveryMan);
   }
 }

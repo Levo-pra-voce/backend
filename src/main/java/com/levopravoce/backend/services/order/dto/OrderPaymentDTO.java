@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class OrderPaymentDTO {
   private Boolean isPaid;
+  private Long orderId;
 }
