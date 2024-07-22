@@ -308,8 +308,8 @@ public class OrderService {
     }).toList();
   }
 
-  public void startOrder(User currentUser, Long id) {
-    Order order = orderRepository.findById(id).orElseThrow();
+  public void startOrder(User currentUser, Long orderId) {
+    Order order = orderRepository.findById(orderId).orElseThrow();
     if (!Objects.equals(order.getDeliveryman().getId(), currentUser.getId())) {
       throw new RuntimeException("Você não tem permissão para iniciar este pedido.");
     }
